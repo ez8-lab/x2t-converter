@@ -472,12 +472,12 @@ void odf_number_styles_context::create_numbers(number_format_state & state, offi
 			indNumber = 0;
 
 		std::wstring str1,str2;
-		boost::wregex re1(L"([^0-9.,]+)");
-		boost::wsmatch result;
-		boost::wregex re2(L"([^#.,]+)");
+		std::wregex re1(L"([^0-9.,]+)");
+		std::wsmatch result;
+		std::wregex re2(L"([^#.,]+)");
 		
-		str1 = boost::regex_replace(splits[indNumber], re1, L"", boost::match_default | boost::format_all);
-		str2 = boost::regex_replace(splits[indNumber], re2, L"", boost::match_default | boost::format_all);
+		str1 = regex_replace(splits[indNumber], re1, L"", std::regex_constants::match_default | std::regex_constants::format_default);
+		str2 = regex_replace(splits[indNumber], re2, L"", std::regex_constants::match_default | std::regex_constants::format_default);
 
 		if (str1.length() < str2.length()) str1 = str2;
 
@@ -677,10 +677,10 @@ void odf_number_styles_context::create_date_style(number_format_state & state, o
 	
 	std::wstring s = state.format_code[0];
 	
-	boost::wregex re(L"([mMdDyYhHsS^(AM)^(PM)^(am)^(pm)]+)([^m^M^d^D^y^Y^h^H^s^S^(AM)^(PM)^(am)^(pm)]+)");
+	std::wregex re(L"([mMdDyYhHsS^(AM)^(PM)^(am)^(pm)]+)([^m^M^d^D^y^Y^h^H^s^S^(AM)^(PM)^(am)^(pm)]+)");
 	
 	std::list<std::wstring> result;
-	bool b = boost::regex_split(std::back_inserter(result),s, re);
+	bool b = regex_split(result,s, re);
 	result.push_back(s);
 
 	size_t sz = 0;
@@ -809,10 +809,10 @@ void odf_number_styles_context::create_time_style(number_format_state & state, o
 	std::wstring s = state.format_code[0];
 	XmlUtils::GetLower(s);
 	
-	boost::wregex re(L"([a-zA-Z]+)(\\W+)");//(L"(\\w+)");
+	std::wregex re(L"([a-zA-Z]+)(\\W+)");//(L"(\\w+)");
 	std::list<std::wstring> result;
-	bool b = boost::regex_split(std::back_inserter(result),s, re);
-	if (b)result.push_back(s);//последний ..выносится - так уж работает boost.regex_split
+	bool b = regex_split(result,s, re);
+	if (b)result.push_back(s);//последний ..выносится - так уж работает regex_split
 
 	size_t sz=0;
 	for (std::list<std::wstring>::iterator it = result.begin(); it != result.end(); ++it)
@@ -884,7 +884,7 @@ void odf_number_styles_context::create_text_style(number_format_state & state, o
 {
 	create_element(L"number", L"text-style", root_elm, odf_context_);
 }
-static std::wstring replace_unwanted(boost::wsmatch const & what)
+static std::wstring replace_unwanted(std::wsmatch const & what)
 {
 	return L"";
 }
@@ -893,14 +893,14 @@ void odf_number_styles_context::detect_format(number_format_state & state)
 	if (state.ods_type != office_value_type::Custom) return;
 	if (state.format_code.empty()) return;
 
-	boost::wregex re_unwanted(L"([\"'])(.+?)\\1");
+	std::wregex re_unwanted(L"([\"'])(.+?)\\1");
 	
-	std::wstring strFormatCode = boost::regex_replace(state.format_code[0], re_unwanted, &replace_unwanted,	boost::match_default | boost::format_all);
+	std::wstring strFormatCode = regex_replace(state.format_code[0], re_unwanted, &replace_unwanted,	std::regex_constants::match_default | std::regex_constants::format_default);
 
  	//find [$<Currency String>-<language info>].
-	boost::wregex re(L"(?:\\[)(?:\\$)(\\S+)?\-(\\S+)(?:\\])");
-	boost::wsmatch result;
-	bool b = boost::regex_search(strFormatCode, result, re);
+	std::wregex re(L"(?:\\[)(?:\\$)(\\S+)?\-(\\S+)(?:\\])");
+	std::wsmatch result;
+	bool b = std::regex_search(strFormatCode, result, re);
 	
 	if (b && result.size() >= 3)
 	{
@@ -913,22 +913,22 @@ void odf_number_styles_context::detect_format(number_format_state & state)
 			ss >> state.language_code;
 		}catch(...){}
 
-		//state.format_code[0] = boost::regex_replace( state.format_code[0],re,L"");
+		//state.format_code[0] = regex_replace( state.format_code[0],re,L"");
 	}
 
 	if (state.format_code.size() > 0) //any
 	{
-		boost::wregex re1(L"([mMhH{2,}sS{2,}]+)");
-		boost::wregex re2(L"([mMdD{1,}yY{2,}]+)");
+		std::wregex re1(L"([mMhH{2,}sS{2,}]+)");
+		std::wregex re2(L"([mMdD{1,}yY{2,}]+)");
 
 		std::wstring tmp = strFormatCode;
 		
-		std::list<std::wstring> result1;
-		bool b1 = boost::regex_split(std::back_inserter(result1), tmp, re1);
+		std::wsmatch result1;
+		bool b1 = std::regex_match(tmp, result1, re1);
 
 		tmp = strFormatCode;
-		std::list<std::wstring> result2;
-		bool b2 = boost::regex_split(std::back_inserter(result2), tmp, re2);
+		std::wsmatch result2;
+		bool b2 = std::regex_match(tmp, result2, re2);
 		
 		if (b1 && b2 && result1.size() > 2 && result2.size() > 2)
 		{

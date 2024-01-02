@@ -35,7 +35,7 @@
 #include <sstream>
 #include <string>
 
-#include <boost/regex.hpp>
+// #include <boost/regex.hpp>
 
 #include <xml/xmlchar.h>
 

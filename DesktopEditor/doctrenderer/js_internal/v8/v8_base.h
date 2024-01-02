@@ -14,11 +14,11 @@
 #include <cstdlib>
 #include <cstring>
 
-#ifdef __ANDROID__
+//#ifdef __ANDROID__
 #ifndef DISABLE_MEMORY_LIMITATION
 #define DISABLE_MEMORY_LIMITATION
 #endif
-#endif
+//#endif
 
 #include "v8.h"
 #include "libplatform/libplatform.h"

@@ -69,7 +69,7 @@ SOURCES += $$PWD/js_logger.cpp
         }
 
         #boost
-        CONFIG += core_boost_date_time
+        # CONFIG += core_boost_date_time
         include($$PWD/../../../Common/3dParty/boost/boost.pri)
     }
 

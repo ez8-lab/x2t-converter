@@ -34,7 +34,8 @@
 #include <string>
 #include <vector>
 
-#include <boost/regex.hpp>
+// #include <boost/regex.hpp>
+#include <regex>
 #include <boost/lexical_cast.hpp>
 
 #include "../../../OOXML/Base/Unit.h"
@@ -377,8 +378,8 @@ public:
 	void start_cell_text();
 	void end_cell_text();
 	
-	static std::wstring replace_cell_row(boost::wsmatch const & what);
-	static std::wstring replace_cell_column(boost::wsmatch const & what);
+	static std::wstring replace_cell_row(std::wsmatch const & what);
+	static std::wstring replace_cell_column(std::wsmatch const & what);
 	
 	void add_child_element( const office_element_ptr & child_element);
 

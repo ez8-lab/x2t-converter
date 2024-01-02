@@ -31,7 +31,8 @@
  */
 #include "formulasconvert.h"
 
-#include <boost/regex.hpp>
+// #include <boost/regex.hpp>
+#include <regex>
 #include <boost/algorithm/string.hpp>
 
 #include"../../OOXML/Base/Unit.h"
@@ -71,12 +72,12 @@ public:
     static void replace_vertical(std::wstring& expr);
     static void replace_space(std::wstring& expr);
 
-	static std::wstring replace_cells_range_formater1(boost::wsmatch const & what);
-	static std::wstring replace_cells_range_formater2(boost::wsmatch const & what);
-	static std::wstring replace_arguments(boost::wsmatch const & what);
-	static std::wstring convert_scobci(boost::wsmatch const & what);
+	static std::wstring replace_cells_range_formater1(std::wsmatch const & what);
+	static std::wstring replace_cells_range_formater2(std::wsmatch const & what);
+	static std::wstring replace_arguments(std::wsmatch const & what);
+	static std::wstring convert_scobci(std::wsmatch const & what);
 	
-	static std::wstring replace_tilda_formater(boost::wsmatch const & what)
+	static std::wstring replace_tilda_formater(std::wsmatch const & what)
 	{
 		if (what[1].matched)
 			return L";";
@@ -89,7 +90,7 @@ public:
 		else
 			return L"";
 	}
-	static std::wstring replace_semicolons_formater(boost::wsmatch const & what)
+	static std::wstring replace_semicolons_formater(std::wsmatch const & what)
 	{
 		if (what[1].matched)
 			return L";";
@@ -102,7 +103,7 @@ public:
 		else
 			return L"";
 	}
-	static std::wstring replace_vertical_formater(boost::wsmatch const & what)
+	static std::wstring replace_vertical_formater(std::wsmatch const & what)
 	{
 		if (what[1].matched)
 		{
@@ -117,7 +118,7 @@ public:
 		
 		return L"";
 	}
-	static std::wstring replace_space_formater(boost::wsmatch const & what)
+	static std::wstring replace_space_formater(std::wsmatch const & what)
 	{
 		if (what[1].matched)
 		{
@@ -381,24 +382,24 @@ void oox2odf_converter::Impl::replace_cells_range(std::wstring& expr, bool bSele
 	if ((0 == expr.find(L"KAVYCHKA")) && (expr.length() - 8 == expr.rfind(L"KAVYCHKA") ))
 		return;
 
-	boost::wregex re(L"(([:$!])+)|(\\S+\\d+)");
+	std::wregex re(L"(([:$!])+)|(\\S+\\d+)");
 
-	boost::wsmatch result;
-	bool b = boost::regex_search(expr, result, re);
+	std::wsmatch result;
+	bool b = std::regex_search(expr, result, re);
 
 	if (b)
 	{
-		boost::wregex re1(L"(\\$?[^\\']+\\!)?([a-zA-Z$]+\\d*)(\\:[a-zA-Z$]+\\d*)?");
+		std::wregex re1(L"(\\$?[^\\']+\\!)?([a-zA-Z$]+\\d*)(\\:[a-zA-Z$]+\\d*)?");
 //                          $   Sheet2   ! $ A1                 :  $ B5    
 //                          $   Sheet2   ! $ A                  :  $ A    
 //                          $   Sheet2   ! $ 1                  :  $ 1    
 		std::wstring workstr = expr;
 		
-		std::wstring res = boost::regex_replace(
+		std::wstring res = regex_replace(
 			workstr,	
 			re1,
 			bSelect ? &replace_cells_range_formater1 : &replace_cells_range_formater2,
-			boost::match_default | boost::format_all);
+			std::regex_constants::match_default | std::regex_constants::format_default);
 	     
 		 expr = res;
 	}
@@ -481,7 +482,7 @@ bool IsRefPresent(const std::wstring& ref_test)
 	if (col >= 0 && row >=0) return true;
 	return false;
 }
-std::wstring oox2odf_converter::Impl::replace_cells_range_formater1(boost::wsmatch const & what)
+std::wstring oox2odf_converter::Impl::replace_cells_range_formater1(std::wsmatch const & what)
 {
     const size_t sz = what.size();
 	
@@ -539,7 +540,7 @@ std::wstring oox2odf_converter::Impl::replace_cells_range_formater1(boost::wsmat
 	return L"";
 }	
 
-std::wstring oox2odf_converter::Impl::replace_cells_range_formater2(boost::wsmatch const & what)
+std::wstring oox2odf_converter::Impl::replace_cells_range_formater2(std::wsmatch const & what)
 {
     const size_t sz = what.size();
 	
@@ -598,8 +599,8 @@ bool oox2odf_converter::Impl::is_simple_ref(std::wstring const & expr)
 	if (expr.find(L" ") != std::wstring::npos) return false;
 	if (expr.find(L";") != std::wstring::npos) return false;
 
-	boost::wsmatch match;
-	if (boost::regex_search(expr, match, boost::wregex(L"([\\w]+\\!)?\\$?[a-zA-Z]+\\$?\\d+(\\:\\$?[a-zA-Z]+\\$?\\d+)?")))
+	std::wsmatch match;
+	if (std::regex_search(expr, match, std::wregex(L"([\\w]+\\!)?\\$?[a-zA-Z]+\\$?\\d+(\\:\\$?[a-zA-Z]+\\$?\\d+)?")))
 	{
 		return true;
 	}
@@ -616,10 +617,10 @@ void oox2odf_converter::Impl::replace_named_ref(std::wstring & expr)
 	replace_vertical(workstr);
 	replace_semicolons(workstr);		
 	
-	std::wstring res1 = boost::regex_replace(
+	std::wstring res1 = regex_replace(
         workstr,
-		boost::wregex(L"('.*?')|(\".*?\")"),
-		&oox2odf_converter::Impl::convert_scobci, boost::match_default | boost::format_all);
+		std::wregex(L"('.*?')|(\".*?\")"),
+		&oox2odf_converter::Impl::convert_scobci, std::regex_constants::match_default | std::regex_constants::format_default);
 
 	std::vector<std::wstring> distance;
 
@@ -653,48 +654,37 @@ void oox2odf_converter::Impl::replace_named_ref(std::wstring & expr)
 // TODO: проверить как сохраняются кавычки в строке
 void oox2odf_converter::Impl::replace_semicolons(std::wstring& expr)
 {
-     const std::wstring res = boost::regex_replace(
+     const std::wstring res = regex_replace(
         expr,
-        //boost::wregex(L"(;)|(?:\".*?\")|(?:'.*?')"),
-        boost::wregex(L"(,)|(\".*?\")|('.*?')"),
+        //std::wregex(L"(;)|(?:\".*?\")|(?:'.*?')"),
+        std::wregex(L"(,)|(\".*?\")|('.*?')"),
         &replace_semicolons_formater,
-        boost::match_default | boost::format_all);
+        std::regex_constants::match_default | std::regex_constants::format_default);
      expr = res;
 }
-
-
-//void oox2odf_converter::Impl::split_(std::wstring& expr)
-//{
-//     const std::wstring res = boost::regex_split(
-//        expr,
-//        boost::wregex(L"(?:(?:\\{)([^\\}]*?)(?:\\}))|(\".*?\")|('.*?')"),
-//        &replace_vertical_formater,
-//        boost::match_default | boost::format_all);
-//     expr = res;
-//}
 
 // заменить вертикальную черту во всех вхождениях в фигурных скобках, но не внутри строк
 void oox2odf_converter::Impl::replace_vertical(std::wstring& expr)
 {
-     const std::wstring res = boost::regex_replace(
+     const std::wstring res = regex_replace(
         expr,
-        boost::wregex(L"(?:(?:\\{)([^\\}]*?)(?:\\}))|(\".*?\")|('.*?')"),
+        std::wregex(L"(?:(?:\\{)([^\\}]*?)(?:\\}))|(\".*?\")|('.*?')"),
         &replace_vertical_formater,
-        boost::match_default | boost::format_all);
+        std::regex_constants::match_default | std::regex_constants::format_default);
      expr = res;
 }
 // заменить запятую во всех вхождениях на пробел 
 void oox2odf_converter::Impl::replace_space(std::wstring& expr)
 {
-     const std::wstring res = boost::regex_replace(
+     const std::wstring res = regex_replace(
         expr,
-        boost::wregex(L"(?:(?:\\{)([^\\}]*?)(?:\\}))|(\".*?\")|('.*?')"),
+        std::wregex(L"(?:(?:\\{)([^\\}]*?)(?:\\}))|(\".*?\")|('.*?')"),
         &replace_space_formater,
-        boost::match_default | boost::format_all);
+        std::regex_constants::match_default | std::regex_constants::format_default);
      expr = res;
 }
 
-std::wstring oox2odf_converter::Impl::convert_scobci(boost::wsmatch const & what)
+std::wstring oox2odf_converter::Impl::convert_scobci(std::wsmatch const & what)
 {
     if (what[1].matched)
     {
@@ -714,7 +704,7 @@ std::wstring oox2odf_converter::Impl::convert_scobci(boost::wsmatch const & what
 	return L"";
 }
 
-std::wstring  oox2odf_converter::Impl::replace_arguments(boost::wsmatch const & what)
+std::wstring  oox2odf_converter::Impl::replace_arguments(std::wsmatch const & what)
 {
 	std::wstring out;
 
@@ -766,15 +756,15 @@ std::wstring oox2odf_converter::Impl::convert_formula(const std::wstring & expr)
 	
     std::wstring workstr = expr;
 
-	std::wstring res1 = boost::regex_replace(
+	std::wstring res1 = regex_replace(
         workstr,
-		boost::wregex(L"('.*?')|(\".*?\")"),
-		&oox2odf_converter::Impl::convert_scobci, boost::match_default | boost::format_all);
+		std::wregex(L"('.*?')|(\".*?\")"),
+		&oox2odf_converter::Impl::convert_scobci, std::regex_constants::match_default | std::regex_constants::format_default);
 	
-	std::wstring res = boost::regex_replace(
+	std::wstring res = regex_replace(
 		res1,
-		boost::wregex(L"(?!([А-Яа-яÀ-ÿ\\w^0-9]+\\d*\\())(([[А-Яа-яÀ-ÿ\\w^0-9]+\\!)?\\$?[\\w^0-9]*\\$?\\d*(\\:\\$?[\\w^0-9]*\\$?\\d*){0,1})"),
-		&oox2odf_converter::Impl::replace_arguments, boost::match_default | boost::format_all);
+		std::wregex(L"(?!([А-Яа-яÀ-ÿ\\w^0-9]+\\d*\\())(([[А-Яа-яÀ-ÿ\\w^0-9]+\\!)?\\$?[\\w^0-9]*\\$?\\d*(\\:\\$?[\\w^0-9]*\\$?\\d*){0,1})"),
+		&oox2odf_converter::Impl::replace_arguments, std::regex_constants::match_default | std::regex_constants::format_default);
 
 	//SUBTOTAL(109,Expense31[Amount])
 	XmlUtils::replace_all( res, L"[", L"KVADRATIN");
@@ -784,11 +774,11 @@ std::wstring oox2odf_converter::Impl::convert_formula(const std::wstring & expr)
 	{
 		XmlUtils::replace_all( res1, L"KAVYCHKA", L"\""); //IMCONJUGATE_emb.xlsx
 	
-		res = boost::regex_replace(
+		res = regex_replace(
 			res1,	
-			boost::wregex(L"(\\$?\\w+\\!)?([a-zA-Z$]+\\d{1,})\\:?([a-zA-Z$]+\\d{1,})?"),
+			std::wregex(L"(\\$?\\w+\\!)?([a-zA-Z$]+\\d{1,})\\:?([a-zA-Z$]+\\d{1,})?"),
 			&replace_cells_range_formater1,
-			boost::match_default | boost::format_all);
+			std::regex_constants::match_default | std::regex_constants::format_default);
 	}
 
 	oox_replace_tmp_back(res);
@@ -810,22 +800,22 @@ std::wstring oox2odf_converter::Impl::convert_conditional_formula(const std::wst
 {
     std::wstring workstr = expr;
 
-	std::wstring res1 = boost::regex_replace(
+	std::wstring res1 = regex_replace(
         workstr,
-		boost::wregex(L"('.*?')|(\".*?\")"),
-		&oox2odf_converter::Impl::convert_scobci, boost::match_default | boost::format_all);
+		std::wregex(L"('.*?')|(\".*?\")"),
+		&oox2odf_converter::Impl::convert_scobci, std::regex_constants::match_default | std::regex_constants::format_default);
 	
-	std::wstring res = boost::regex_replace(
+	std::wstring res = regex_replace(
 		res1,
-		boost::wregex(L"(?:(?=[()])(.*?)(?=[)]))"),
-		&oox2odf_converter::Impl::replace_arguments, boost::match_default | boost::format_all);
+		std::wregex(L"(?:(?=[()])(.*?)(?=[)]))"),
+		&oox2odf_converter::Impl::replace_arguments, std::regex_constants::match_default | std::regex_constants::format_default);
 
 	if (res1 == res)
 	{
-		res = boost::regex_replace(res1,	
-			boost::wregex(L"(\\$?\\w+\\!)?([a-zA-Z$]+\\d{1,})\\:?([a-zA-Z$]+\\d{1,})?"),
+		res = regex_replace(res1,	
+			std::wregex(L"(\\$?\\w+\\!)?([a-zA-Z$]+\\d{1,})\\:?([a-zA-Z$]+\\d{1,})?"),
 			&replace_cells_range_formater1,
-			boost::match_default | boost::format_all);
+			std::regex_constants::match_default | std::regex_constants::format_default);
 	     
 	}
 

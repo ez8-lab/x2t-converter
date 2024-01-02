@@ -31,7 +31,8 @@
  */
 
 
-#include <boost/regex.hpp>
+// #include <boost/regex.hpp>
+#include <regex>
 #include <boost/algorithm/string.hpp>
 
 #include "../../Common/utils.h"
@@ -724,10 +725,10 @@ void odt_conversion_context::set_field_instr()
 		current_fields.back().in_span = false;
 		
 		std::wstring ref;
-		boost::wregex r2 (L"([\"'])(.+?)\\1");			
+		std::wregex r2 (L"([\"'])(.+?)\\1");			
 
 		std::list<std::wstring> result1;
-		bool b1 = boost::regex_split(std::back_inserter(result1), instr, r2);
+		bool b1 = regex_split(result1, instr, r2);
 
 		if (b1 && !result1.empty())
         {

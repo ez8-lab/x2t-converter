@@ -46,6 +46,8 @@
 
 #include "mediaitems.h"
 
+#include <regex>
+
 namespace NSFonts
 {
     class IApplicationFonts;
@@ -194,4 +196,39 @@ private:
 };
 
 }
+}
+
+template <typename Container>
+bool regex_split(Container& result, const std::wstring &input, const std::wregex &pattern) {
+    static_assert(std::is_same<typename Container::value_type, std::wstring>::value,
+                  "Container must store std::wstring");
+
+    auto start = input.cbegin();
+    auto end = input.cend();
+    std::wsmatch match;
+    bool has_match = false;
+
+    while (std::regex_search(start, end, match, pattern)) {
+        result.emplace_back(std::wstring(start, match[0].first));
+        start = match[0].second;
+        has_match = true;
+    }
+
+    result.emplace_back(std::wstring(start, end));
+    return has_match;
+}
+
+static inline std::wstring regex_replace(const std::wstring &input, const std::wregex &pattern, std::wstring (*formatter)(const std::wsmatch &), std::regex_constants::match_flag_type flags = std::regex_constants::match_default) {
+    std::wstring result;
+    std::wsmatch match;
+
+    auto start = input.cbegin();
+    auto end = input.cend();
+    while (std::regex_search(start, end, match, pattern, flags)) {
+        result.append(start, match[0].first);
+        result.append(formatter(match)); // Use the formatter function
+        start = match[0].second;
+    }
+    result.append(start, end);
+    return result;
 }

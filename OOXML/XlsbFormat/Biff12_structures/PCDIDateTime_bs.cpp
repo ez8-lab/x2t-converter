@@ -31,11 +31,15 @@
  */
 
 
-#include <boost/date_time/posix_time/conversion.hpp>
+// #include <boost/date_time/posix_time/conversion.hpp>
 
 #include "PCDIDateTime.h"
-#include "boost/date_time/posix_time/posix_time_types.hpp"
-#include <boost/date_time/posix_time/time_parsers.hpp>
+// #include "boost/date_time/posix_time/posix_time_types.hpp"
+// #include <boost/date_time/posix_time/time_parsers.hpp>
+
+#include <sstream>
+#include <iomanip>
+#include <ctime>
 
 using namespace XLS;
 
@@ -86,9 +90,9 @@ namespace XLSB
 
 	void PCDIDateTime::fromString(const std::wstring& str)
     {
-		std::string ts(str.begin(), str.end());
-		boost::posix_time::ptime pt(boost::posix_time::time_from_string(ts));
-		tm pt_tm = boost::posix_time::to_tm(pt);
+		std::tm pt_tm = {};
+        std::istringstream iss(std::string(str.begin(), str.end()));
+        iss >> std::get_time(&pt_tm, "%Y-%m-%d %H:%M:%S");
 
 		yr = pt_tm.tm_year;
 		mon = pt_tm.tm_mon;

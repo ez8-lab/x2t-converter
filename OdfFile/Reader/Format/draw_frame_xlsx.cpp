@@ -37,7 +37,7 @@
 #include <string>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/regex.h>
+// #include <boost/regex.h>
 
 #include <xml/xmlchar.h>
 #include "odf_document.h"

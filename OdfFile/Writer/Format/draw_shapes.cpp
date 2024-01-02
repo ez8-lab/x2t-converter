@@ -38,7 +38,7 @@
 
 #include <boost/foreach.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/regex.h>
+// #include <boost/regex.h>
 #include <boost/lexical_cast.hpp>
 
 #include <xml/xmlchar.h>

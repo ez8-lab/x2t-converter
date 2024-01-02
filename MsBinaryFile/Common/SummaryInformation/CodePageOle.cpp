@@ -39,7 +39,11 @@
 
 #include "../../../UnicodeConverter/UnicodeConverter.h"
 
-#include <boost/date_time.hpp>
+// #include <boost/date_time.hpp>
+#include <iostream>
+#include <sstream>
+#include <iomanip>
+#include <ctime>
 
 namespace OLEPS
 {
@@ -148,28 +152,27 @@ bool PropertyDTM::IsEmpty()
 }
 std::wstring PropertyDTM::toString()
 {
-	_UINT64 temp = ((_UINT64)dwHighDateTime << 32) + dwLowDateTime;
+    _UINT64 temp = ((_UINT64)dwHighDateTime << 32) + dwLowDateTime;
 
-	boost::posix_time::ptime daysFrom1601(boost::gregorian::date(1601, 1, 1));
-	boost::posix_time::ptime date_time_ = daysFrom1601 + boost::posix_time::milliseconds(temp / 10000);
+    std::time_t epochStartTime = -11644473600LL; // Seconds from 1601 to 1970
+    std::time_t timeInSeconds = (temp / 10000000) - epochStartTime;
 
-	short	Min = (short)date_time_.time_of_day().minutes();
-	short	Hour = (short)date_time_.time_of_day().hours();
-	short	Day = (short)date_time_.date().day();
-	short	Month = (short)date_time_.date().month().as_number();
-	int		Year = (short)date_time_.date().year();
+    std::tm *tmStruct = std::gmtime(&timeInSeconds);
 
-	std::wstring value = std::to_wstring(Year)
-								+ L"-" + (Month < 10 ? L"0" : L"") + std::to_wstring(Month)	
-								+ L"-" + (Day < 10 ? L"0" : L"") + std::to_wstring(Day);
+    int Year = tmStruct->tm_year + 1900;
+    int Month = tmStruct->tm_mon + 1;
+    int Day = tmStruct->tm_mday;
+    int Hour = tmStruct->tm_hour;
+    int Min = tmStruct->tm_min;
 
-	int hours = 0, minutes = 0;
-	double sec = 0;
+    std::wostringstream wss;
+    wss << std::setfill(L'0') << std::setw(4) << Year << L"-"
+        << std::setw(2) << Month << L"-"
+        << std::setw(2) << Day << L"T"
+        << std::setw(2) << Hour << L":"
+        << std::setw(2) << Min << L":00Z";
 
-	value += L"T";
-	value +=	(Hour < 10 ? L"0" : L"") + std::to_wstring(Hour) + L":" +
-				(Min < 10 ? L"0" : L"") + std::to_wstring(Min) + L":00Z";
-	return value;
+    return wss.str();
 }
 //-------------------------------------------------------------------
 PropertyInt::PropertyInt(unsigned int prop_type, const unsigned short value_type) : Property(prop_type, value_type)

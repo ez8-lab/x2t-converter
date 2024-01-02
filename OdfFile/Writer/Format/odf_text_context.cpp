@@ -32,7 +32,8 @@
 
 #include "logging.h"
 
-#include <boost/regex.hpp>
+// #include <boost/regex.hpp>
+#include <regex>
 
 #include <iostream>
 
@@ -106,12 +107,12 @@ void odf_text_context::add_text_content(const std::wstring & text)
 {
 	if (current_level_.empty()) return;
 
-	//boost::wregex re(L"?:([ ]{2,})|(.+)");//(L"(\\w+)");
+	//std::wregex re(L"?:([ ]{2,})|(.+)");//(L"(\\w+)");
 	//std::list<std::wstring> result;
-	////boost::match_results<std::wstring::const_iterator> result;
-	////bool b = boost::regex_match(text, result, re);
+	////std::match_results<std::wstring::const_iterator> result;
+	////bool b = std::regex_match(text, result, re);
 	//std::wstring t = text;
-	//bool b = boost::regex_split(std::back_inserter(result),t, re);
+	//bool b = regex_split(result,t, re);
 
 	//int res;
 	//int sz=0;
@@ -130,12 +131,12 @@ void odf_text_context::add_text_content(const std::wstring & text)
 	//}
 
 	//std::string expression = "1a234bc43";
-	boost::wregex re(L"[ ]{2,}");
-	boost::wsregex_iterator i(
+	std::wregex re(L"[ ]{2,}");
+	std::wsregex_iterator i(
 	  text.begin (),     
 	  text.end (),     
 	  re);
-	boost::wsregex_iterator j;
+	std::wsregex_iterator j;
 	size_t pos=0;
 	for(; i!=j;++i) 
 	{
@@ -143,7 +144,7 @@ void odf_text_context::add_text_content(const std::wstring & text)
 		if (s.length() > 0)current_level_.back().elm->add_text(s);
 
 		std::wstringstream s1;
-		s1 << (*i);
+		s1 << i->str();
 		s= s1.str();
 		if (s.length() > 0)
 			add_text_space((int)s.length());

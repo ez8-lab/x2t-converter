@@ -36,7 +36,7 @@
 #include <string>
 #include <vector>
 
-#include <boost/regex.hpp>
+// #include <boost/regex.hpp>
 //
 #include "../../Common/CPString.h"
 #include <xml/xmlchar.h>

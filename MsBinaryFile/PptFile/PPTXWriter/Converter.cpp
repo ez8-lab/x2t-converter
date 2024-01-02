@@ -59,7 +59,9 @@
 
 #include <boost/uuid/detail/md5.hpp>
 #include <boost/algorithm/hex.hpp>
-#include <boost/regex.hpp>
+// #include <boost/regex.hpp>
+
+#include <regex>
 
 typedef boost::uuids::detail::md5 MD5;
 
@@ -1901,11 +1903,11 @@ std::vector<std::wstring> CPPTXWriter::GrepPaths(const std::vector<std::wstring>
     std::vector<std::wstring> filtredPaths;
     try
     {
-        boost::wregex regEx(strRegEx);
-        boost::wsmatch wSmath;
+        std::wregex regEx(strRegEx);
+        std::wsmatch wSmath;
         for (const auto& path : paths)
         {
-            if (boost::regex_match(path, wSmath, regEx))
+            if (std::regex_match(path, wSmath, regEx))
                 filtredPaths.push_back(path);
         }
     } catch(...) {}

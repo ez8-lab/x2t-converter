@@ -34,7 +34,8 @@
 #include "OperatorPtgs.h"
 #include "PtgParen.h"
 
-#include <boost/regex.hpp>
+// #include <std/regex.hpp>
+#include <regex>
 #include <boost/algorithm/string/erase.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include "PtgList.h"
@@ -47,8 +48,8 @@ namespace XLS
 // static
 const bool SyntaxPtg::is_operators(std::wstring::const_iterator first, std::wstring::const_iterator last)
 {
-	static boost::wregex reg_operators(L"^ *[-+*/^&%<=>:]");
-	return boost::regex_search(first, last, reg_operators);
+	static std::wregex reg_operators(L"^ *[-+*/^&%<=>:]");
+	return std::regex_search(first, last, reg_operators);
 }
 
 
@@ -57,9 +58,9 @@ const bool SyntaxPtg::extract_PtgAdd(std::wstring::const_iterator& first, std::w
 {
 	if(!operand_expected)
 	{
-		static boost::wregex reg_add(L"^ *\\+ *");
-		boost::match_results<std::wstring::const_iterator> results;
-		if(boost::regex_search(first, last, results, reg_add))
+		static std::wregex reg_add(L"^ *\\+ *");
+		std::match_results<std::wstring::const_iterator> results;
+		if(std::regex_search(first, last, results, reg_add))
 		{
 			first = results[0].second;
 			return true;
@@ -74,9 +75,9 @@ const bool SyntaxPtg::extract_PtgUplus(std::wstring::const_iterator& first, std:
 {
 	if(operand_expected)
 	{
-		static boost::wregex reg_uplus(L"^ *\\+ *");
-		boost::match_results<std::wstring::const_iterator> results;
-		if(boost::regex_search(first, last, results, reg_uplus))
+		static std::wregex reg_uplus(L"^ *\\+ *");
+		std::match_results<std::wstring::const_iterator> results;
+		if(std::regex_search(first, last, results, reg_uplus))
 		{
 			first = results[0].second;
 			return true;
@@ -91,9 +92,9 @@ const bool SyntaxPtg::extract_PtgSub(std::wstring::const_iterator& first, std::w
 {
 	if(!operand_expected)
 	{
-		static boost::wregex reg_sub(L"^ *- *");
-		boost::match_results<std::wstring::const_iterator> results;
-		if(boost::regex_search(first, last, results, reg_sub))
+		static std::wregex reg_sub(L"^ *- *");
+		std::match_results<std::wstring::const_iterator> results;
+		if(std::regex_search(first, last, results, reg_sub))
 		{
 			first = results[0].second;
 			return true;
@@ -108,9 +109,9 @@ const bool SyntaxPtg::extract_PtgUminus(std::wstring::const_iterator& first, std
 {
 	if(operand_expected)
 	{
-		static boost::wregex reg_uminus(L"^ *- *");
-		boost::match_results<std::wstring::const_iterator> results;
-		if(boost::regex_search(first, last, results, reg_uminus))
+		static std::wregex reg_uminus(L"^ *- *");
+		std::match_results<std::wstring::const_iterator> results;
+		if(std::regex_search(first, last, results, reg_uminus))
 		{
 			first = results[0].second;
 			return true;
@@ -123,9 +124,9 @@ const bool SyntaxPtg::extract_PtgUminus(std::wstring::const_iterator& first, std
 // static
 const bool SyntaxPtg::extract_PtgPercent(std::wstring::const_iterator& first, std::wstring::const_iterator last, const bool operand_expected)
 {
-	static boost::wregex reg_perc(L"^ *% *");
-	boost::match_results<std::wstring::const_iterator> results;
-	if(boost::regex_search(first, last, results, reg_perc))
+	static std::wregex reg_perc(L"^ *% *");
+	std::match_results<std::wstring::const_iterator> results;
+	if(std::regex_search(first, last, results, reg_perc))
 	{
 		OperatorPtgPtr last_operator;
 		if(!operand_expected)
@@ -141,9 +142,9 @@ const bool SyntaxPtg::extract_PtgPercent(std::wstring::const_iterator& first, st
 // static
 const bool SyntaxPtg::extract_PtgMul(std::wstring::const_iterator& first, std::wstring::const_iterator last)
 {
-	static boost::wregex reg_mul(L"^ *\\* *");
-	boost::match_results<std::wstring::const_iterator> results;
-	if(boost::regex_search(first, last, results, reg_mul))
+	static std::wregex reg_mul(L"^ *\\* *");
+	std::match_results<std::wstring::const_iterator> results;
+	if(std::regex_search(first, last, results, reg_mul))
 	{
 		first = results[0].second;
 		return true;
@@ -155,9 +156,9 @@ const bool SyntaxPtg::extract_PtgMul(std::wstring::const_iterator& first, std::w
 // static
 const bool SyntaxPtg::extract_PtgDiv(std::wstring::const_iterator& first, std::wstring::const_iterator last)
 {
-	static boost::wregex reg_div(L"^ */ *");
-	boost::match_results<std::wstring::const_iterator> results;
-	if(boost::regex_search(first, last, results, reg_div))
+	static std::wregex reg_div(L"^ */ *");
+	std::match_results<std::wstring::const_iterator> results;
+	if(std::regex_search(first, last, results, reg_div))
 	{
 		first = results[0].second;
 		return true;
@@ -169,9 +170,9 @@ const bool SyntaxPtg::extract_PtgDiv(std::wstring::const_iterator& first, std::w
 // static
 const bool SyntaxPtg::extract_PtgPower(std::wstring::const_iterator& first, std::wstring::const_iterator last)
 {
-	static boost::wregex reg_pow(L"^ *\\^ *");
-	boost::match_results<std::wstring::const_iterator> results;
-	if(boost::regex_search(first, last, results, reg_pow))
+	static std::wregex reg_pow(L"^ *\\^ *");
+	std::match_results<std::wstring::const_iterator> results;
+	if(std::regex_search(first, last, results, reg_pow))
 	{
 		first = results[0].second;
 		return true;
@@ -183,9 +184,9 @@ const bool SyntaxPtg::extract_PtgPower(std::wstring::const_iterator& first, std:
 // static
 const bool SyntaxPtg::extract_PtgEq(std::wstring::const_iterator& first, std::wstring::const_iterator last)
 {
-	static boost::wregex reg_eq(L"^ *= *");
-	boost::match_results<std::wstring::const_iterator> results;
-	if(boost::regex_search(first, last, results, reg_eq))
+	static std::wregex reg_eq(L"^ *= *");
+	std::match_results<std::wstring::const_iterator> results;
+	if(std::regex_search(first, last, results, reg_eq))
 	{
 		first = results[0].second;
 		return true;
@@ -197,9 +198,9 @@ const bool SyntaxPtg::extract_PtgEq(std::wstring::const_iterator& first, std::ws
 // static
 const bool SyntaxPtg::extract_PtgNe(std::wstring::const_iterator& first, std::wstring::const_iterator last)
 {
-	static boost::wregex reg_ne(L"^ *<> *");
-	boost::match_results<std::wstring::const_iterator> results;
-	if(boost::regex_search(first, last, results, reg_ne))
+	static std::wregex reg_ne(L"^ *<> *");
+	std::match_results<std::wstring::const_iterator> results;
+	if(std::regex_search(first, last, results, reg_ne))
 	{
 		first = results[0].second;
 		return true;
@@ -211,9 +212,9 @@ const bool SyntaxPtg::extract_PtgNe(std::wstring::const_iterator& first, std::ws
 // static
 const bool SyntaxPtg::extract_PtgLe(std::wstring::const_iterator& first, std::wstring::const_iterator last)
 {
-	static boost::wregex reg_le(L"^ *<= *");
-	boost::match_results<std::wstring::const_iterator> results;
-	if(boost::regex_search(first, last, results, reg_le))
+	static std::wregex reg_le(L"^ *<= *");
+	std::match_results<std::wstring::const_iterator> results;
+	if(std::regex_search(first, last, results, reg_le))
 	{
 		first = results[0].second;
 		return true;
@@ -225,9 +226,9 @@ const bool SyntaxPtg::extract_PtgLe(std::wstring::const_iterator& first, std::ws
 // static
 const bool SyntaxPtg::extract_PtgLt(std::wstring::const_iterator& first, std::wstring::const_iterator last)
 {
-	static boost::wregex reg_lt(L"^ *< *");
-	boost::match_results<std::wstring::const_iterator> results;
-	if(boost::regex_search(first, last, results, reg_lt))
+	static std::wregex reg_lt(L"^ *< *");
+	std::match_results<std::wstring::const_iterator> results;
+	if(std::regex_search(first, last, results, reg_lt))
 	{
 		first = results[0].second;
 		return true;
@@ -239,9 +240,9 @@ const bool SyntaxPtg::extract_PtgLt(std::wstring::const_iterator& first, std::ws
 // static
 const bool SyntaxPtg::extract_PtgGe(std::wstring::const_iterator& first, std::wstring::const_iterator last)
 {
-	static boost::wregex reg_ge(L"^ *>= *");
-	boost::match_results<std::wstring::const_iterator> results;
-	if(boost::regex_search(first, last, results, reg_ge))
+	static std::wregex reg_ge(L"^ *>= *");
+	std::match_results<std::wstring::const_iterator> results;
+	if(std::regex_search(first, last, results, reg_ge))
 	{
 		first = results[0].second;
 		return true;
@@ -253,9 +254,9 @@ const bool SyntaxPtg::extract_PtgGe(std::wstring::const_iterator& first, std::ws
 // static
 const bool SyntaxPtg::extract_PtgGt(std::wstring::const_iterator& first, std::wstring::const_iterator last)
 {
-	static boost::wregex reg_gt(L"^ *> *");
-	boost::match_results<std::wstring::const_iterator> results;
-	if(boost::regex_search(first, last, results, reg_gt))
+	static std::wregex reg_gt(L"^ *> *");
+	std::match_results<std::wstring::const_iterator> results;
+	if(std::regex_search(first, last, results, reg_gt))
 	{
 		first = results[0].second;
 		return true;
@@ -267,9 +268,9 @@ const bool SyntaxPtg::extract_PtgGt(std::wstring::const_iterator& first, std::ws
 // static
 const bool SyntaxPtg::extract_PtgConcat(std::wstring::const_iterator& first, std::wstring::const_iterator last)
 {
-	static boost::wregex reg_concat(L"^ *& *");
-	boost::match_results<std::wstring::const_iterator> results;
-	if(boost::regex_search(first, last, results, reg_concat))
+	static std::wregex reg_concat(L"^ *& *");
+	std::match_results<std::wstring::const_iterator> results;
+	if(std::regex_search(first, last, results, reg_concat))
 	{
 		first = results[0].second;
 		return true;
@@ -281,9 +282,9 @@ const bool SyntaxPtg::extract_PtgConcat(std::wstring::const_iterator& first, std
 // static
 const bool SyntaxPtg::extract_PtgUnion(std::wstring::const_iterator& first, std::wstring::const_iterator last)
 {
-	static boost::wregex reg_union(L"^ *, *");
-	boost::match_results<std::wstring::const_iterator> results;
-	if(boost::regex_search(first, last, results, reg_union))
+	static std::wregex reg_union(L"^ *, *");
+	std::match_results<std::wstring::const_iterator> results;
+	if(std::regex_search(first, last, results, reg_union))
 	{
 		first = results[0].second;
 		return true;
@@ -295,10 +296,10 @@ const bool SyntaxPtg::extract_PtgUnion(std::wstring::const_iterator& first, std:
 // static
 const bool SyntaxPtg::is_PtgIsect(std::wstring::const_iterator& first, std::wstring::const_iterator last)
 {
-	static boost::wregex reg_before_comma(L"^ *[,()]");
-	static boost::wregex reg_isect(L"^ ");
-	return !boost::regex_search(first, last, reg_before_comma) &&
-			boost::regex_search(first, last, reg_isect);
+	static std::wregex reg_before_comma(L"^ *[,()]");
+	static std::wregex reg_isect(L"^ ");
+	return !std::regex_search(first, last, reg_before_comma) &&
+			std::regex_search(first, last, reg_isect);
 }
 
 
@@ -317,9 +318,9 @@ const bool SyntaxPtg::extract_PtgIsect(std::wstring::const_iterator& first, std:
 // static
 const bool SyntaxPtg::extract_PtgRange(std::wstring::const_iterator& first, std::wstring::const_iterator last)
 {
-	static boost::wregex reg_range(L"^ *: *");
-	boost::match_results<std::wstring::const_iterator> results;
-	if(boost::regex_search(first, last, results, reg_range))
+	static std::wregex reg_range(L"^ *: *");
+	std::match_results<std::wstring::const_iterator> results;
+	if(std::regex_search(first, last, results, reg_range))
 	{
 		first = results[0].second;
 		return true;
@@ -331,9 +332,9 @@ const bool SyntaxPtg::extract_PtgRange(std::wstring::const_iterator& first, std:
 // static
 const bool SyntaxPtg::extract_comma(std::wstring::const_iterator& first, std::wstring::const_iterator last)
 {
-	static boost::wregex reg_comma(L"^ *, *");
-	boost::match_results<std::wstring::const_iterator> results;
-	if(boost::regex_search(first, last, results, reg_comma))
+	static std::wregex reg_comma(L"^ *, *");
+	std::match_results<std::wstring::const_iterator> results;
+	if(std::regex_search(first, last, results, reg_comma))
 	{
 		first = results[0].second;
 		return true;
@@ -344,9 +345,9 @@ const bool SyntaxPtg::extract_comma(std::wstring::const_iterator& first, std::ws
 // static
 const bool SyntaxPtg::extract_semicolon(std::wstring::const_iterator& first, std::wstring::const_iterator last)
 {
-	static boost::wregex reg_semi(L"^ *; *");
-	boost::match_results<std::wstring::const_iterator> results;
-	if(boost::regex_search(first, last, results, reg_semi))
+	static std::wregex reg_semi(L"^ *; *");
+	std::match_results<std::wstring::const_iterator> results;
+	if(std::regex_search(first, last, results, reg_semi))
 	{
 		first = results[0].second;
 		return true;
@@ -358,12 +359,12 @@ const bool SyntaxPtg::extract_semicolon(std::wstring::const_iterator& first, std
 // static
 const bool SyntaxPtg::extract_PtgInt(std::wstring::const_iterator& first, std::wstring::const_iterator last, std::wstring& out_str)
 {
-	static boost::wregex reg_differ(L"^\\d+[.:]"); // differ from PtgNum(5.55) and PtgRef(7:7)
-	boost::match_results<std::wstring::const_iterator> results;
-	if(!boost::regex_search(first, last, reg_differ))
+	static std::wregex reg_differ(L"^\\d+[.:]"); // differ from PtgNum(5.55) and PtgRef(7:7)
+	std::match_results<std::wstring::const_iterator> results;
+	if(!std::regex_search(first, last, reg_differ))
 	{
-		static boost::wregex reg_int(L"^\\d+");
-		if(boost::regex_search(first, last, results, reg_int))
+		static std::wregex reg_int(L"^\\d+");
+		if(std::regex_search(first, last, results, reg_int))
 		{
 			std::wstring extracted(first, results[0].second);
 			if(5 > extracted.length() || 5 == extracted.length() && L"65535" >= extracted)
@@ -381,9 +382,9 @@ const bool SyntaxPtg::extract_PtgInt(std::wstring::const_iterator& first, std::w
 // static
 const bool SyntaxPtg::extract_PtgNum(std::wstring::const_iterator& first, std::wstring::const_iterator last, std::wstring& out_str)
 {
-	static boost::wregex reg_num(L"^[+-]?\\d*(\\d|\\.)\\d*([eE][+-]?\\d+)?");
-	boost::match_results<std::wstring::const_iterator> results;
-	if(boost::regex_search(first, last, results, reg_num))
+	static std::wregex reg_num(L"^[+-]?\\d*(\\d|\\.)\\d*([eE][+-]?\\d+)?");
+	std::match_results<std::wstring::const_iterator> results;
+	if(std::regex_search(first, last, results, reg_num))
 	{
 		out_str = std::wstring(first, results[0].second);
 		first = results[0].second;
@@ -396,9 +397,9 @@ const bool SyntaxPtg::extract_PtgNum(std::wstring::const_iterator& first, std::w
 // static
 const bool SyntaxPtg::extract_PtgBool(std::wstring::const_iterator& first, std::wstring::const_iterator last, std::wstring& out_str)
 {
-	static boost::wregex reg_bool(L"^(?i)(TRUE|FALSE)([-+*/^&%<=>: ;),]|$)"); // searched case insensitive
-	boost::match_results<std::wstring::const_iterator> results;
-	if(boost::regex_search(first, last, results, reg_bool))
+	static std::wregex reg_bool(L"^(?i)(TRUE|FALSE)([-+*/^&%<=>: ;),]|$)"); // searched case insensitive
+	std::match_results<std::wstring::const_iterator> results;
+	if(std::regex_search(first, last, results, reg_bool))
 	{
 		out_str = std::wstring(first, results[1].second);
 		first = results[1].second;
@@ -411,9 +412,9 @@ const bool SyntaxPtg::extract_PtgBool(std::wstring::const_iterator& first, std::
 // static
 const bool SyntaxPtg::extract_PtgStr(std::wstring::const_iterator& first, std::wstring::const_iterator last, std::wstring& out_str)
 {
-	static boost::wregex reg_str(L"^\"((\"\"|[^\"])*)\"");
-	boost::match_results<std::wstring::const_iterator> results;
-	if(boost::regex_search(first, last, results, reg_str))
+	static std::wregex reg_str(L"^\"((\"\"|[^\"])*)\"");
+	std::match_results<std::wstring::const_iterator> results;
+	if(std::regex_search(first, last, results, reg_str))
 	{
 		out_str = results.str(1);
 		XmlUtils::replace_all(out_str, L"\"\"", L"\"");
@@ -427,10 +428,10 @@ const bool SyntaxPtg::extract_PtgStr(std::wstring::const_iterator& first, std::w
 // static
 const bool SyntaxPtg::extract_PtgName(std::wstring::const_iterator& first, std::wstring::const_iterator last, unsigned int& out_num)
 {
-	static boost::wregex reg_name(L"^(\\w[\\w\\d.]*)([-+*/^&%<=>: ;),]|$)");
+	static std::wregex reg_name(L"^(\\w[\\w\\d.]*)([-+*/^&%<=>: ;),]|$)");
 	
-	boost::match_results<std::wstring::const_iterator> results;
-	if(boost::regex_search(first, last, results, reg_name))
+	std::match_results<std::wstring::const_iterator> results;
+	if(std::regex_search(first, last, results, reg_name))
 	{
 		std::wstring define_names = results.str(1);
 
@@ -447,10 +448,10 @@ const bool SyntaxPtg::extract_PtgName(std::wstring::const_iterator& first, std::
 // static
 const bool SyntaxPtg::extract_PtgList(std::wstring::const_iterator& first, std::wstring::const_iterator last, PtgList& ptgList, unsigned short ixti)
 {
-	static boost::wregex reg_table_name(L"^(\\w[\\w\\d.]*)\\["); //tableName '=SUM(tblName[Total])'
+	static std::wregex reg_table_name(L"^(\\w[\\w\\d.]*)\\["); //tableName '=SUM(tblName[Total])'
 
-	boost::match_results<std::wstring::const_iterator> results;
-	if (boost::regex_search(first, last, results, reg_table_name))
+	std::match_results<std::wstring::const_iterator> results;
+	if (std::regex_search(first, last, results, reg_table_name))
 	{
 		std::wstring tableName;
 		_UINT32 indexTable;
@@ -464,14 +465,14 @@ const bool SyntaxPtg::extract_PtgList(std::wstring::const_iterator& first, std::
 			ptgList.invalid = false;
 			ptgList.nonresident = false;
 			ptgList.ixti = ixti;
-			static boost::wregex reg_inside_table1(L"\\[#?[\\s\\w\\d.]+\\]");
-			static boost::wregex reg_inside_table2(L"\\[#\\w[\\s\\w\\d.]*\\],\\[#\\w[\\s\\w\\d.]*\\]");
-			static boost::wregex reg_inside_table3(L"^[,;:]?\\[#?[\\s\\w\\d.]+\\]");
+			static std::wregex reg_inside_table1(L"\\[#?[\\s\\w\\d.]+\\]");
+			static std::wregex reg_inside_table2(L"\\[#\\w[\\s\\w\\d.]*\\],\\[#\\w[\\s\\w\\d.]*\\]");
+			static std::wregex reg_inside_table3(L"^[,;:]?\\[#?[\\s\\w\\d.]+\\]");
 
 			first = results[1].second;
 
-			boost::match_results<std::wstring::const_iterator> results_1;
-			if (boost::regex_search(first, last, results_1, reg_inside_table1))
+			std::match_results<std::wstring::const_iterator> results_1;
+			if (std::regex_search(first, last, results_1, reg_inside_table1))
 			{
 				_UINT16 indexColumn = -1;
 				std::wstring insider;
@@ -483,7 +484,7 @@ const bool SyntaxPtg::extract_PtgList(std::wstring::const_iterator& first, std::
 
 				if (insider == L"[#Data]")
 				{
-					if (boost::regex_search(first, last, results_1, reg_inside_table2))
+					if (std::regex_search(first, last, results_1, reg_inside_table2))
 					{
 						if (results_1.str(0) == L"[#Data],[#Totals]")
 						{
@@ -500,7 +501,7 @@ const bool SyntaxPtg::extract_PtgList(std::wstring::const_iterator& first, std::
 				}
 				else if (insider == L"[#Headers]")
 				{
-					if (boost::regex_search(first, last, results_1, reg_inside_table2))
+					if (std::regex_search(first, last, results_1, reg_inside_table2))
 					{
 						if (results_1.str(0) == L"[#Headers],[#Data]")
 						{
@@ -529,7 +530,7 @@ const bool SyntaxPtg::extract_PtgList(std::wstring::const_iterator& first, std::
 				//first = results_1[0].first;
 				first = results_1[0].second;
 
-				if (boost::regex_search(first, last, results_1, reg_inside_table3))
+				if (std::regex_search(first, last, results_1, reg_inside_table3))
 				{
 					insider = results_1.str(0);
 					if (!insider.empty() && insider[0] != '[')
@@ -545,7 +546,7 @@ const bool SyntaxPtg::extract_PtgList(std::wstring::const_iterator& first, std::
 							ptgList.columns = 0x01;
 							ptgList.colFirst = indexColumn;							
 
-							if (boost::regex_search(first, last, results_1, reg_inside_table3))
+							if (std::regex_search(first, last, results_1, reg_inside_table3))
 							{
 								insider = results_1.str(0);
 								if (!insider.empty() && insider[0] != '[')
@@ -582,9 +583,9 @@ const bool SyntaxPtg::extract_PtgList(std::wstring::const_iterator& first, std::
 // static
 const bool SyntaxPtg::extract_PtgRefErr(std::wstring::const_iterator& first, std::wstring::const_iterator last)
 {
-	static boost::wregex reg_err(L"^(?i)#REF!");
-	boost::match_results<std::wstring::const_iterator> results;
-	if(boost::regex_search(first, last, results, reg_err))
+	static std::wregex reg_err(L"^(?i)#REF!");
+	std::match_results<std::wstring::const_iterator> results;
+	if(std::regex_search(first, last, results, reg_err))
 	{
 		first = results[0].second;
 		return true;
@@ -596,9 +597,9 @@ const bool SyntaxPtg::extract_PtgRefErr(std::wstring::const_iterator& first, std
 // static
 const bool SyntaxPtg::extract_PtgErr(std::wstring::const_iterator& first, std::wstring::const_iterator last, std::wstring& out_str)
 {
-	static boost::wregex reg_err(L"^(?i)(#NULL!|#DIV/0!|#VALUE!|#REF!|#NAME\\?|#NUM!|#N/A)");
-	boost::match_results<std::wstring::const_iterator> results;
-	if(boost::regex_search(first, last, results, reg_err))
+	static std::wregex reg_err(L"^(?i)(#NULL!|#DIV/0!|#VALUE!|#REF!|#NAME\\?|#NUM!|#N/A)");
+	std::match_results<std::wstring::const_iterator> results;
+	if(std::regex_search(first, last, results, reg_err))
 	{
 		out_str = std::wstring(first, results[0].second);
 		first = results[0].second;
@@ -611,13 +612,13 @@ const bool SyntaxPtg::extract_PtgErr(std::wstring::const_iterator& first, std::w
 // static
 const bool SyntaxPtg::extract_PtgArea(std::wstring::const_iterator& first, std::wstring::const_iterator last, std::wstring& out_str)
 {
-	static boost::wregex reg_full(L"^\\$?[A-Za-z]+\\$?\\d+:\\$?[A-Za-z]+\\$?\\d+");
-	static boost::wregex reg_columns(L"^\\$?[A-Za-z]+:\\$?[A-Za-z]+");
-	static boost::wregex reg_rows(L"^\\$?\\d+:\\$?\\d+");
-	boost::match_results<std::wstring::const_iterator> results;
-	if (boost::regex_search(first, last, results, reg_full) ||
-		boost::regex_search(first, last, results, reg_columns) ||
-		boost::regex_search(first, last, results, reg_rows))
+	static std::wregex reg_full(L"^\\$?[A-Za-z]+\\$?\\d+:\\$?[A-Za-z]+\\$?\\d+");
+	static std::wregex reg_columns(L"^\\$?[A-Za-z]+:\\$?[A-Za-z]+");
+	static std::wregex reg_rows(L"^\\$?\\d+:\\$?\\d+");
+	std::match_results<std::wstring::const_iterator> results;
+	if (std::regex_search(first, last, results, reg_full) ||
+		std::regex_search(first, last, results, reg_columns) ||
+		std::regex_search(first, last, results, reg_rows))
 	{
 		out_str = std::wstring(first, results[0].second);
 		first = results[0].second;
@@ -630,9 +631,9 @@ const bool SyntaxPtg::extract_PtgArea(std::wstring::const_iterator& first, std::
 // static
 const bool SyntaxPtg::extract_PtgRef(std::wstring::const_iterator& first, std::wstring::const_iterator last, std::wstring& out_str)
 {
-	static boost::wregex reg_ref(L"^(\\$?[A-Za-z]+\\$?\\d+)([-+*/^&%<=>: ;),]|$)");
-	boost::match_results<std::wstring::const_iterator> results;
-	if(boost::regex_search(first, last, results, reg_ref))
+	static std::wregex reg_ref(L"^(\\$?[A-Za-z]+\\$?\\d+)([-+*/^&%<=>: ;),]|$)");
+	std::match_results<std::wstring::const_iterator> results;
+	if(std::regex_search(first, last, results, reg_ref))
 	{
 		out_str = std::wstring(first, results[1].second);
 		first = results[1].second;
@@ -645,11 +646,11 @@ const bool SyntaxPtg::extract_PtgRef(std::wstring::const_iterator& first, std::w
 // static
 const bool SyntaxPtg::extract_3D_part(std::wstring::const_iterator& first, std::wstring::const_iterator last, unsigned short& ixti)
 {
-	static boost::wregex reg_sheets(L"^(\\w[\\w\\d.]*(:\\w[\\w\\d.]*)?)!");
-	static boost::wregex reg_quoted(L"^'((''|[^]['\\/*?])*)'!");
-	boost::match_results<std::wstring::const_iterator> results;
-	if (boost::regex_search(first, last, results, reg_sheets) ||
-		boost::regex_search(first, last, results, reg_quoted))
+	static std::wregex reg_sheets(L"^(\\w[\\w\\d.]*(:\\w[\\w\\d.]*)?)!");
+	static std::wregex reg_quoted(L"^'((''|[^]['\\/*?])*)'!");
+	std::match_results<std::wstring::const_iterator> results;
+	if (std::regex_search(first, last, results, reg_sheets) ||
+		std::regex_search(first, last, results, reg_quoted))
 	{
 
 		std::wstring sheets_names = results.str(1);
@@ -668,9 +669,9 @@ const bool SyntaxPtg::extract_3D_part(std::wstring::const_iterator& first, std::
 // static
 const bool SyntaxPtg::extract_UndefinedName(std::wstring::const_iterator& first, std::wstring::const_iterator last)
 {
-	static boost::wregex reg_undef(L"^([\\w\\d.]+)([-+*/^&%<=>: ;),]|$)");
-	boost::match_results<std::wstring::const_iterator> results;
-	if(boost::regex_search(first, last, results, reg_undef))
+	static std::wregex reg_undef(L"^([\\w\\d.]+)([-+*/^&%<=>: ;),]|$)");
+	std::match_results<std::wstring::const_iterator> results;
+	if(std::regex_search(first, last, results, reg_undef))
 	{
 		// Not compares to the defined names since it has already been done in extract_PtgName
 		first = results[1].second;
@@ -683,9 +684,9 @@ const bool SyntaxPtg::extract_UndefinedName(std::wstring::const_iterator& first,
 // static
 const bool SyntaxPtg::extract_PtgArray(std::wstring::const_iterator& first, std::wstring::const_iterator last, std::wstring& out_str)
 {
-	static boost::wregex reg_array(L"^\\{([^{}\"]+|\"((\"\"|[^\"])*)\")([,;]([^{}\"]+|\"((\"\"|[^\"])*)\"))*\\}");
-	boost::match_results<std::wstring::const_iterator> results;
-	if (boost::regex_search(first, last, results, reg_array))
+	static std::wregex reg_array(L"^\\{([^{}\"]+|\"((\"\"|[^\"])*)\")([,;]([^{}\"]+|\"((\"\"|[^\"])*)\"))*\\}");
+	std::match_results<std::wstring::const_iterator> results;
+	if (std::regex_search(first, last, results, reg_array))
 	{
 		out_str = std::wstring(first, results[0].second);
 		first = results[0].second;
@@ -698,9 +699,9 @@ const bool SyntaxPtg::extract_PtgArray(std::wstring::const_iterator& first, std:
 // static
 const bool SyntaxPtg::extract_LeftParenthesis(std::wstring::const_iterator& first, std::wstring::const_iterator last)
 {
-	static boost::wregex reg_left_par(L"^ *\\( *");
-	boost::match_results<std::wstring::const_iterator> results;
-	if(boost::regex_search(first, last, results, reg_left_par))
+	static std::wregex reg_left_par(L"^ *\\( *");
+	std::match_results<std::wstring::const_iterator> results;
+	if(std::regex_search(first, last, results, reg_left_par))
 	{
 		first = results[0].second;
 		return true;
@@ -712,9 +713,9 @@ const bool SyntaxPtg::extract_LeftParenthesis(std::wstring::const_iterator& firs
 // static
 const bool SyntaxPtg::extract_RightParenthesis(std::wstring::const_iterator& first, std::wstring::const_iterator last)
 {
-	static boost::wregex reg_right_par(L"^ *\\)");
-	boost::match_results<std::wstring::const_iterator> results;
-	if(boost::regex_search(first, last, results, reg_right_par))
+	static std::wregex reg_right_par(L"^ *\\)");
+	std::match_results<std::wstring::const_iterator> results;
+	if(std::regex_search(first, last, results, reg_right_par))
 	{
 		first = results[0].second;
 		return true;
@@ -726,9 +727,9 @@ const bool SyntaxPtg::extract_RightParenthesis(std::wstring::const_iterator& fir
 // static
 const bool SyntaxPtg::extract_PtgFunc(std::wstring::const_iterator& first, std::wstring::const_iterator last, std::wstring& out_str)
 {
-	static boost::wregex reg_func(L"^([\\w\\d.]+)\\(");
-	boost::match_results<std::wstring::const_iterator> results;
-	if(boost::regex_search(first, last, results, reg_func))
+	static std::wregex reg_func(L"^([\\w\\d.]+)\\(");
+	std::match_results<std::wstring::const_iterator> results;
+	if(std::regex_search(first, last, results, reg_func))
 	{
 		out_str = std::wstring(first, results[1].second);
 		first = results[1].second;

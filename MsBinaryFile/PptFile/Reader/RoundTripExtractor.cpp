@@ -32,7 +32,8 @@
 #include "RoundTripExtractor.h"
 #include "../../../DesktopEditor/common/Directory.h"
 #include "../../../DesktopEditor/common/SystemUtils.h"
-#include <boost/regex.hpp>
+// #include <boost/regex.hpp>
+#include <regex>
 
 using namespace PPT;
 
@@ -53,11 +54,11 @@ vector_string RoundTripExtractor::find(const std::wstring& strRegEx) const
     std::vector<std::wstring> filtredPaths;
     try
     {
-        boost::wregex regEx(strRegEx);
-        boost::wsmatch wSmath;
+        std::wregex regEx(strRegEx);
+        std::wsmatch wSmath;
         for (const auto& path : paths)
         {
-            if (boost::regex_match(path, wSmath, regEx))
+            if (std::regex_match(path, wSmath, regEx))
                 filtredPaths.push_back(path);
         }
     } catch(...) {}

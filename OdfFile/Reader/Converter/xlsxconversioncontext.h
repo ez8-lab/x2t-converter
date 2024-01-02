@@ -34,7 +34,8 @@
 
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/regex.hpp>
+// #include <boost/regex.hpp>
+#include <regex>
 #include <unordered_map>
 
 #include "oox_conversion_context.h"
@@ -223,7 +224,7 @@ private:
 	math_context					math_context_;
 	forms_context					forms_context_;
 
-	static std::wstring change_external(boost::wsmatch const & what);
+	static std::wstring change_external(std::wsmatch const & what);
 };
 
 }

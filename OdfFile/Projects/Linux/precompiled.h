@@ -9,12 +9,13 @@
 #include <sstream>
 #include <map>
 #include <boost/lexical_cast.hpp>
-#include <boost/regex.hpp>
+// #include <boost/regex.hpp>
+#include <regex>
 #include <boost/noncopyable.hpp>
 #include <boost/make_shared.hpp>
 #include <list>
 #include <boost/functional.hpp>
-#include <boost/regex.h>
+// #include <boost/regex.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/ref.hpp>
@@ -28,7 +29,9 @@
 #include <set>
 #include <fstream>
 #include <random>
-#include <boost/date_time.hpp>
+// #include <boost/date_time.hpp>
+#include <chrono>
+#include <ctime>
 #include <boost/optional/optional_io.hpp>
 
 //#include "../../DataTypes/backgroundcolor.h"

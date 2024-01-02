@@ -93,39 +93,29 @@ std::wstring RtfUtility::convertDateTime (int dt)
 }
 int RtfUtility::convertDateTime (const std::wstring & dt_)
 {
-	int result = 0;
+    if (dt_.empty())
+        return PROP_DEF;
 
-	if ( dt_.empty() ) return PROP_DEF;
+    std::wstring dt = dt_;
+    std::wistringstream wss(dt);
 
-	std::string dt(dt_.begin(), dt_.end());
+    std::tm tm_struct = {};
+    wss >> std::get_time(&tm_struct, L"%Y-%m-%dT%H:%M:%S");
 
-	try
-	{
-		boost::posix_time::ptime date_time_;
+    if (wss.fail())
+        return PROP_DEF;
 
-		boost::posix_time::time_input_facet *tif = new boost::posix_time::time_input_facet;
-		tif->set_iso_extended_format();
-		std::istringstream strm(dt);
-		strm.imbue(std::locale(std::locale::classic(), tif));
-		strm >> date_time_;
+    std::time_t time = std::mktime(&tm_struct);
+    if (time == -1)
+        return PROP_DEF;
 
-		short	Min		= (short)date_time_.time_of_day().minutes();
-		short	Hour	= (short)date_time_.time_of_day().hours();
-		short	Day		= (short)date_time_.date().day();
-		short	Month	= (short)date_time_.date().month().as_number();
-		int		Year	= (short)date_time_.date().year() - 1900;
+    std::tm *local_tm = std::localtime(&time);
 
-		SETBITS(result, 0 , 5,  Min);
-		SETBITS(result, 6 , 10, Hour);
-		SETBITS(result, 11, 15, Day);
-		SETBITS(result, 16, 19, Month);
-		SETBITS(result, 20, 28, Year);
-	}
-	catch(...)
-	{
-	}
-
-	return result;
+    return (local_tm->tm_min & 0x1F) |
+           ((local_tm->tm_hour & 0x1F) << 6) |
+           ((local_tm->tm_mday & 0x1F) << 11) |
+           (((local_tm->tm_mon + 1) & 0x0F) << 16) |
+           (((local_tm->tm_year + 1900 - 2000) & 0x1FF) << 20);
 }
 
 //------------------------------------------------------------------------------------------------------

@@ -33,10 +33,12 @@
 #include "xlsx_utils.h"
 
 #include <boost/lexical_cast.hpp>
-#include <boost/regex.hpp>
+// #include <boost/regex.hpp>
+#include <regex>
 
-#include <boost/date_time/gregorian/gregorian.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
+// #include <boost/date_time/gregorian/gregorian.hpp>
+// #include <boost/date_time/posix_time/posix_time.hpp>
+#include <chrono>
 
 #include "../../../OOXML/Base/Unit.h"
 
@@ -46,17 +48,17 @@ namespace oox {
 
 bool IsNumber(const std::wstring &value)
 {
-	boost::wregex rule(L"^\\-{0,1}[0-9]*[.,]{0,1}[0-9]*$");
-	boost::match_results<std::wstring::const_iterator> results;
+	std::wregex rule(L"^\\-{0,1}[0-9]*[.,]{0,1}[0-9]*$");
+	std::match_results<std::wstring::const_iterator> results;
 
-	return boost::regex_search(value/*.begin(), value.end(), results*/, rule);
+	return std::regex_search(value/*.begin(), value.end(), results*/, rule);
 }
 std::wstring GetNumberFromString(const std::wstring &value)
 {
-	boost::wregex rule(L"^\\s*\\-{0,1}[0-9]*[.,]{0,1}[0-9]*\\s*$");
-	boost::match_results<std::wstring::const_iterator> results;
+	std::wregex rule(L"^\\s*\\-{0,1}[0-9]*[.,]{0,1}[0-9]*\\s*$");
+	std::match_results<std::wstring::const_iterator> results;
 
-    if (boost::regex_match(value, results, rule))
+    if (std::regex_match(value, results, rule))
     {
         return (results[0].str());
 	}
@@ -201,39 +203,47 @@ std::wstring cellType2Str(XlsxCellType::type type)
     }
 }
 
-boost::int64_t convertDate(int Year, int Month, int Day)
+int64_t convertDate(int Year, int Month, int Day)
 {
-	if (Year < 1400 || Year >10000)
-		return - 1;
- 	if (Month < 1 || Month > 12)
-		return - 1;
-	if (Day < 1 || Day > 31)
-		return - 1;
-	
-	boost::int64_t daysFrom1900  =  boost::gregorian::date_duration(boost::gregorian::date(Year, Month, Day) - boost::gregorian::date(1900, 1, 1)).days() + 1;
+    if (Year < 1400 || Year > 10000 || Month < 1 || Month > 12 || Day < 1 || Day > 31)
+        return -1;
 
-    if (Year <= 1900 && 
-        Month <= 2 &&
-        Day <= 29)
-    {
+    std::tm start_date = {};
+    start_date.tm_year = 0; // 1900
+    start_date.tm_mon = 0;  // January
+    start_date.tm_mday = 1; // 1st day
+
+    std::time_t start_time = std::mktime(&start_date);
+
+    std::tm input_date = {};
+    input_date.tm_year = Year - 1900;
+    input_date.tm_mon = Month - 1; // Months are 0-based in tm
+    input_date.tm_mday = Day;
+
+    std::time_t input_time = std::mktime(&input_date);
+
+    const int64_t seconds_per_day = 60 * 60 * 24;
+    int64_t daysFrom1900 = difftime(input_time, start_time) / seconds_per_day + 1;
+
+    if (Year <= 1900 && Month <= 2 && Day <= 29) {
         return daysFrom1900;
-    }
-    else
-    {
+    } else {
         return daysFrom1900 + 1;
     }
 }
 
 double convertTime(int hours, int minutes, double sec)
-{  
-    boost::posix_time::time_duration t(hours, minutes, 0);
-    t += boost::posix_time::millisec(static_cast<boost::uint32_t>(sec * 1000));
-    boost::posix_time::time_duration day(24, 0, 0);
+{
+    // Calculate total milliseconds for the given time
+    std::chrono::milliseconds t = hours * std::chrono::hours(1) +
+                                  minutes * std::chrono::minutes(1) +
+                                  std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::duration<double>(sec));
 
-    const boost::uint64_t m1 = t.total_milliseconds() ;
-    const boost::uint64_t m2 = day.total_milliseconds() ;
-    const double v = 1.0 * m1 / m2;
-    return v;
+    // Calculate total milliseconds in a day
+    std::chrono::milliseconds day = std::chrono::hours(24);
+
+    // Calculate the ratio of the given time to a day
+    return static_cast<double>(t.count()) / static_cast<double>(day.count());
 }
 
 bool parseDateTime(const std::wstring & DateTime, int & Year, int & Month, int & Day,
@@ -242,9 +252,9 @@ bool parseDateTime(const std::wstring & DateTime, int & Year, int & Month, int &
     // for example, "1899-12-31T05:37:46.665696"
     try 
     {
-        boost::wregex r(L"([\\d]+)-([\\d]+)-([\\d]+)(?:T([\\d]+):([\\d]+):([\\d]+)(?:\\.([\\d]+))?)?");
-        boost::match_results<std::wstring::const_iterator> res;
-        if (boost::regex_match(DateTime, res, r))
+        std::wregex r(L"([\\d]+)-([\\d]+)-([\\d]+)(?:T([\\d]+):([\\d]+):([\\d]+)(?:\\.([\\d]+))?)?");
+        std::match_results<std::wstring::const_iterator> res;
+        if (std::regex_match(DateTime, res, r))
         {
             Year    = boost::lexical_cast<int>(res[1].str());
             Month   = boost::lexical_cast<int>(res[2].str());
@@ -275,9 +285,9 @@ bool parseTime(const std::wstring & Time, int & Hours, int & Minutes, double & s
 {
     try 
     {
-        boost::wregex r(L"PT([\\d]+)H([\\d]+)M([\\d]+)(?:\\.([\\d]+))?S");
-        boost::match_results<std::wstring::const_iterator> res;
-        if (boost::regex_match(Time, res, r))
+        std::wregex r(L"PT([\\d]+)H([\\d]+)M([\\d]+)(?:\\.([\\d]+))?S");
+        std::match_results<std::wstring::const_iterator> res;
+        if (std::regex_match(Time, res, r))
         {
             Hours   = boost::lexical_cast<int>(res[1].str());
             Minutes = boost::lexical_cast<int>(res[2].str());

@@ -19,6 +19,7 @@ core_windows {
 core_linux {
     LIBS += -L$$CORE_V8_PATH_LIBS -lv8_base -lv8_libplatform -lv8_libbase -lv8_nosnapshot -lv8_external_snapshot
     LIBS += -L$$CORE_V8_PATH_LIBS -licui18n -licuuc -licudata
+	QMAKE_LFLAGS += "-Wl,-rpath,."
 }
 
 core_mac {

@@ -46,9 +46,12 @@
 #include "../../../XlsxFormat/Worksheets/Worksheet.h"
 #include "../../../../Common/MS-LCID.h"
 
-#include <boost/date_time.hpp>
+// #include <boost/date_time.hpp>
+#include <chrono>
 #include <boost/format.hpp>
-#include <boost/regex.hpp>
+// #include <boost/regex.hpp>
+#include <regex>
+#include <iomanip>
 
 #include <ctime>
 #include <locale>
@@ -216,22 +219,43 @@ void CSVWriter::Close()
 		impl_->Close();
 }
 //---------------------------------------------------------------------------------------------------------------------------------
-static std::wstring replace_unwanted(boost::wsmatch const & what)
+static std::wstring replace_unwanted(std::wsmatch const & what)
 {
 	return L"";
 }
+
+template <typename Container>
+bool regex_split(Container& result, const std::wstring &input, const std::wregex &pattern) {
+    static_assert(std::is_same<typename Container::value_type, std::wstring>::value,
+                  "Container must store std::wstring");
+
+    auto start = input.cbegin();
+    auto end = input.cend();
+    std::wsmatch match;
+    bool has_match = false;
+
+    while (std::regex_search(start, end, match, pattern)) {
+        result.emplace_back(std::wstring(start, match[0].first));
+        start = match[0].second;
+        has_match = true;
+    }
+
+    result.emplace_back(std::wstring(start, end));
+    return has_match;
+}
+
 int CSVWriter::Impl::detect_format(std::wstring & format_code)
 {
 	if (format_code.empty()) return SimpleTypes::Spreadsheet::celltypeStr;
 
-	boost::wregex re_unwanted(L"([\"'])(.+?)\\1");
+	std::wregex re_unwanted(L"([\"'])(.+?)\\1");
 
-	std::wstring strFormatCode = boost::regex_replace(format_code, re_unwanted, &replace_unwanted, boost::match_default | boost::format_all);
+	std::wstring strFormatCode = regex_replace(format_code, re_unwanted, &replace_unwanted, std::regex_constants::match_default | std::regex_constants::format_default);
 
 	//find [$<Currency String>-<language info>].
-	boost::wregex re(L"(?:\\[)(?:\\$)(\\S+)?\-(\\S+)(?:\\])");
-	boost::wsmatch result;
-	bool b = boost::regex_search(strFormatCode, result, re);
+	std::wregex re(L"(?:\\[)(?:\\$)(\\S+)?\-(\\S+)(?:\\])");
+	std::wsmatch result;
+	bool b = std::regex_search(strFormatCode, result, re);
 
 	std::wstring strCurrencyLetter;
 
@@ -247,21 +271,21 @@ int CSVWriter::Impl::detect_format(std::wstring & format_code)
 		}
 		catch (...) {}
 
-		//format_code = boost::regex_replace( format_code,re,L"");
+		//format_code = regex_replace( format_code,re,L"");
 	}
 	if (false == format_code.empty()) //any
 	{
-		boost::wregex re1(L"([mMhHs{2,}S{2,}]+)");
-		boost::wregex re2(L"([mMdDy{2,}Y{2,}]+)");
+		std::wregex re1(L"([mMhHs{2,}S{2,}]+)");
+		std::wregex re2(L"([mMdDy{2,}Y{2,}]+)");
 
 		std::wstring tmp = strFormatCode;
 
 		std::list<std::wstring> result1;
-		bool b1 = boost::regex_split(std::back_inserter(result1), tmp, re1);
+		bool b1 = regex_split(result1, tmp, re1);
 
 		tmp = strFormatCode;
 		std::list<std::wstring> result2;
-		bool b2 = boost::regex_split(std::back_inserter(result2), tmp, re2);
+		bool b2 = regex_split(result2, tmp, re2);
 
 		if (b1 && b2 && result1.size() > 2 && result2.size() > 2)
 		{
@@ -316,15 +340,19 @@ std::wstring CSVWriter::Impl::convert_date_time(const std::wstring & sValue, std
 		int iDate = (int)dTime;
 		dTime -= iDate;
 
-		boost::gregorian::date date_ = boost::gregorian::date(1900, 1, 1) + boost::gregorian::date_duration(iDate - 2);
+		// Calculate date
+		std::tm tmp_tm{0, 0, 0, iDate - 2, 0, 0};
+		time_t base_time = mktime(&tmp_tm);
 
-		boost::posix_time::time_duration day(24, 0, 0);
-		double millisec = day.total_milliseconds() * dTime;
+		// Get date components
+		std::tm* date_tm = std::localtime(&base_time);
+		int hours = static_cast<int>(dTime * 24);
+		int minutes = static_cast<int>((dTime * 24 - hours) * 60);
+		double seconds = ((dTime * 24 - hours) * 60 - minutes) * 60;
 
+		// Convert to milliseconds
+		double millisec = (hours * 60 * 60 + minutes * 60 + seconds) * 1000;
 		double sec = millisec / 1000.;
-		int hours = (int)(sec / 60. / 60.);
-		int minutes = (int)((sec - (hours * 60 * 60)) / 60.);
-		sec = sec - (hours * 60 + minutes) * 60.;
 
 		if (format_code.empty())
 		{
@@ -339,9 +367,9 @@ std::wstring CSVWriter::Impl::convert_date_time(const std::wstring & sValue, std
 				std::time_t now = std::time(nullptr);
     			std::tm* currentTime = std::localtime(&now);
 
-				currentTime->tm_year = date_.year() - 1900;  // Устанавливаем год
-				currentTime->tm_mon = date_.month() - 1;     // Устанавливаем месяц (от 0 до 11)
-				currentTime->tm_mday = date_.day();          // Устанавливаем день
+				currentTime->tm_year = date_tm->tm_year;  // Устанавливаем год
+				currentTime->tm_mon = date_tm->tm_mon;     // Устанавливаем месяц (от 0 до 11)
+				currentTime->tm_mday = date_tm->tm_mday;          // Устанавливаем день
 
 
 				wss << std::put_time(currentTime, L"%x");  // Формат "%x" - формат даты для текущей локали
@@ -388,10 +416,6 @@ std::wstring CSVWriter::Impl::convert_date_time(const std::wstring & sValue, std
 				LCID = std::string(wsLCID.begin(), wsLCID.end());
 			}
 			std::wstring output;
-#if 0
-			NSUnicodeConverter::CUnicodeConverter oConverter;
-			output = oConverter.FormatDateTime(iDate, format_code, LCID);
-#else
 			std::wstring sAferTime;
 			if (std::wstring::npos != format_code.find(L"AM/PM"))
 			{
@@ -423,7 +447,7 @@ std::wstring CSVWriter::Impl::convert_date_time(const std::wstring & sValue, std
 					//	output += date_.day_of_week().as_long_wstring();
 					//else
 					{
-						unsigned short day = date_.day().as_number();
+						unsigned short day = date_tm->tm_mday;
 						if (symbol_size > 1 && day < 10) output += L"0";
 						output += std::to_wstring(day);
 					}
@@ -445,7 +469,7 @@ std::wstring CSVWriter::Impl::convert_date_time(const std::wstring & sValue, std
 					}
 					else
 					{
-						unsigned short month = date_.month().as_number();
+						unsigned short month = date_tm->tm_mon;
                         if (symbol_size == 2 && month < 10)
 						{
 							output += L"0";
@@ -456,21 +480,10 @@ std::wstring CSVWriter::Impl::convert_date_time(const std::wstring & sValue, std
 						}
 						else
 						{
-							std::shared_ptr<boost::gregorian::date_facet> df;
-							if(symbol_size == 3)
-							{
-								df = std::make_shared<boost::gregorian::date_facet>(2);
-
-							}
-							else
-							{
-								df = std::make_shared<boost::gregorian::date_facet>(12);
-							}
 							std::wstringstream wss;
-    						wss.imbue(std::locale(loc_, df.get()));
-							wss << date_.month();
+							wss.imbue(loc_);
+        					wss << std::put_time(date_tm, symbol_size == 3 ? L"%b" : L"%B");
 							output += wss.str();
-
 						}
 
 						/*if (symbol_size < 3) */
@@ -487,7 +500,7 @@ std::wstring CSVWriter::Impl::convert_date_time(const std::wstring & sValue, std
 				case L'y':
 				case L'Y':
 				{
-					std::wstring year = boost::lexical_cast<std::wstring>(date_.year());
+					std::wstring year = boost::lexical_cast<std::wstring>(date_tm->tm_year);
 					if (symbol_size > 2) output += year;
 					else output += year.substr(2);
 				}break;
@@ -496,7 +509,6 @@ std::wstring CSVWriter::Impl::convert_date_time(const std::wstring & sValue, std
 				}
 				i += symbol_size - 1;
 			}
-#endif
 			return output;
 		}
 	}

@@ -397,4 +397,21 @@ static bool FromHumanReadableByteCount(const std::wstring& wsString, long long& 
 }
 } // namespace NSStringExt
 
+#include <regex>
+
+static inline std::wstring regex_replace(const std::wstring &input, const std::wregex &pattern, std::wstring (*formatter)(const std::wsmatch &), std::regex_constants::match_flag_type flags = std::regex_constants::match_default) {
+    std::wstring result;
+    std::wsmatch match;
+
+    auto start = input.cbegin();
+    auto end = input.cend();
+    while (std::regex_search(start, end, match, pattern, flags)) {
+        result.append(start, match[0].first);
+        result.append(formatter(match)); // Use the formatter function
+        start = match[0].second;
+    }
+    result.append(start, end);
+    return result;
+}
+
 #endif // _BUILD_STRING_CROSSPLATFORM_H_

@@ -39,11 +39,33 @@
 #include <xml/simple_xml_writer.h>
 #include "../../Common/CPSharedPtr.h"
 
-#include <boost/regex.hpp>
-#include <boost/algorithm/string/regex.hpp>
+// #include <boost/regex.hpp>
+// #include <boost/algorithm/string/regex.hpp>
 
 #include "../../Formulas/formulasconvert.h"
 #include "../../../OOXML/Base/Unit.h"
+
+#include <regex>
+
+template <typename Container>
+bool regex_split(Container& result, const std::wstring &input, const std::wregex &pattern) {
+    static_assert(std::is_same<typename Container::value_type, std::wstring>::value,
+                  "Container must store std::wstring");
+
+    auto start = input.cbegin();
+    auto end = input.cend();
+    std::wsmatch match;
+    bool has_match = false;
+
+    while (std::regex_search(start, end, match, pattern)) {
+        result.emplace_back(std::wstring(start, match[0].first));
+        start = match[0].second;
+        has_match = true;
+    }
+
+    result.emplace_back(std::wstring(start, end));
+    return has_match;
+}
 
 namespace cpdoccore {
 namespace oox {
@@ -413,7 +435,7 @@ void xlsx_dataValidations_context::add_formula(const std::wstring & name, const 
 	formulasconvert::odf2oox_converter converter;
 
 	std::vector<std::wstring> arrFormula;
-	boost::algorithm::split_regex(arrFormula, formula, boost::wregex(L"and"));
+	regex_split(arrFormula, formula, std::wregex(L"and"));
 
 	std::wstring val, val2, operator_;
 

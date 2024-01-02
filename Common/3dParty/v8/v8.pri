@@ -2,6 +2,7 @@ CORE_V8_PATH_OVERRIDE=$$PWD
 !v8_version_60:CONFIG += v8_version_89
 
 v8_version_89 {
+	message(v8_version_89)
     CONFIG += c++14
     CONFIG += use_v8_monolith
     DEFINES += V8_VERSION_89_PLUS
@@ -18,6 +19,8 @@ v8_version_89 {
 
     CORE_V8_PATH_OVERRIDE = $$PWD/../v8_89
 }
+
+message(v8)
 
 CORE_V8_PATH_INCLUDE    = $$CORE_V8_PATH_OVERRIDE/v8
 CORE_V8_PATH_LIBS       = $$CORE_V8_PATH_INCLUDE/out.gn/$$CORE_BUILDS_PLATFORM_PREFIX/obj
@@ -66,6 +69,7 @@ core_linux {
         LIBS += -L$$CORE_V8_PATH_LIBS -lv8_base -lv8_libplatform -lv8_libbase -l$$SNAPSHOT_LIB -lv8_libsampler
         LIBS += -L$$CORE_V8_PATH_LIBS/third_party/icu -licui18n -licuuc
     }
+	QMAKE_LFLAGS += "-Wl,-rpath,."
 }
 
 core_mac {

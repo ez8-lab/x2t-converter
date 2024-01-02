@@ -63,9 +63,11 @@
 #include "../../XlsbFormat/Biff12_records/Fmla.h"
 #include "../../../MsBinaryFile/XlsFile/Format/Logic/Biff_structures/BIFF12/CellRef.h"
 
-#include <boost/regex.hpp>
-#include <boost/date_time/gregorian/gregorian.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
+// #include <boost/regex.hpp>
+#include <regex>
+// #include <boost/date_time/gregorian/gregorian.hpp>
+// #include <boost/date_time/posix_time/posix_time.hpp>
+#include <chrono>
 
 using namespace XLS;
 
@@ -189,10 +191,10 @@ namespace OOX
 			// for example, "1899-12-31T05:37:46.665696"
 			try
 			{
-				boost::wregex r(L"([\\d]+)-([\\d]+)-([\\d]+)(?:T([\\d]+):([\\d]+):([\\d]+)(?:\\.([\\d]+))?)?");
-				boost::match_results<std::wstring::const_iterator> res;
+				std::wregex r(L"([\\d]+)-([\\d]+)-([\\d]+)(?:T([\\d]+):([\\d]+):([\\d]+)(?:\\.([\\d]+))?)?");
+				std::match_results<std::wstring::const_iterator> res;
 				
-				if (boost::regex_match(Date, res, r))
+				if (std::regex_match(Date, res, r))
 				{
 					Value = 0;
 
@@ -215,35 +217,44 @@ namespace OOX
 					if (res[7].matched)
 						FSec = boost::lexical_cast<int>(res[7].str());
 
-					if (Year < 1400 || Year >10000)
-						return -1;
-					if (Month < 1 || Month > 12)
-						return -1;
-					if (Day < 1 || Day > 31)
+					if (Year < 1400 || Year > 10000 || Month < 1 || Month > 12 || Day < 1 || Day > 31)
 						return -1;
 
-					boost::int64_t daysFrom1900 = boost::gregorian::date_duration(boost::gregorian::date(Year, Month, Day) - boost::gregorian::date(1900, 1, 1)).days() + 1;
+					std::tm start_date = {};
+					start_date.tm_year = 0; // 1900
+					start_date.tm_mon = 0;  // January
+					start_date.tm_mday = 1; // 1st day
 
-					if (Year <= 1900 &&
-						Month <= 2 &&
-						Day <= 29)
-					{
+					std::time_t start_time = std::mktime(&start_date);
+
+					std::tm input_date = {};
+					input_date.tm_year = Year - 1900;
+					input_date.tm_mon = Month - 1; // Months are 0-based in tm
+					input_date.tm_mday = Day;
+
+					std::time_t input_time = std::mktime(&input_date);
+
+					const int64_t seconds_per_day = 60 * 60 * 24;
+					int64_t daysFrom1900 = difftime(input_time, start_time) / seconds_per_day + 1;
+
+					if (Year <= 1900 && Month <= 2 && Day <= 29) {
 						Value = daysFrom1900;
-					}
-					else
-					{
+					} else {
 						Value = daysFrom1900 + 1;
 					}
 
 					if (Hours > 0 || Sec > 0 || Minutes > 0)
 					{
-						boost::posix_time::time_duration t(Hours, Minutes, 0);
-						t += boost::posix_time::millisec(static_cast<boost::uint32_t>(Sec * 1000));
-						boost::posix_time::time_duration day(24, 0, 0);
+						// Calculate total milliseconds for the given time
+						std::chrono::milliseconds t = Hours * std::chrono::hours(1) +
+													Minutes * std::chrono::minutes(1) +
+													std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::duration<double>(Sec));
 
-						const boost::uint64_t m1 = t.total_milliseconds();
-						const boost::uint64_t m2 = day.total_milliseconds();
-						Value += 1.0 * m1 / m2;						
+						// Calculate total milliseconds in a day
+						std::chrono::milliseconds day = std::chrono::hours(24);
+
+						// Calculate the ratio of the given time to a day
+						Value += static_cast<double>(t.count()) / static_cast<double>(day.count());			
 					}
 
 					return true;
@@ -265,7 +276,7 @@ namespace OOX
 			r1c1_formula_convert()
 			{}
 
-			static std::wstring replace_ref(boost::wsmatch const & what)
+			static std::wstring replace_ref(std::wsmatch const & what)
 			{
 				const size_t sz = what.size();
 
@@ -280,7 +291,7 @@ namespace OOX
 
 				return getCellAddress(row, col, true, true);
 			}
-			static std::wstring replace_ref_from_base(boost::wsmatch const & what)
+			static std::wstring replace_ref_from_base(std::wsmatch const & what)
 			{
 				const size_t sz = what.size();
 
@@ -331,20 +342,20 @@ namespace OOX
 
 			std::wstring convert(const std::wstring& expr)
 			{
-				//boost::wregex findRef(L"(\R(\\d+)\C(\\d+))"); //easy
-				boost::wregex findRefFromBase(L"(\R((\\[?\-?\\d+\\]?)?)\C((\\[?\-?\\d+\\]?)?))");
+				//std::wregex findRef(L"(\R(\\d+)\C(\\d+))"); //easy
+				std::wregex findRefFromBase(L"(\R((\\[?\-?\\d+\\]?)?)\C((\\[?\-?\\d+\\]?)?))");
 
-				//std::wstring result = boost::regex_replace(
+				//std::wstring result = regex_replace(
 				//	expr,
 				//	findRef,
 				//	&replace_ref,
-				//	boost::match_default | boost::format_all);
+				//	std::regex_constants::match_default | std::regex_constants::format_default);
 
-				std::wstring result = boost::regex_replace(
+				std::wstring result = regex_replace(
 					expr,
 					findRefFromBase,
 					&replace_ref_from_base,
-					boost::match_default | boost::format_all);
+					std::regex_constants::match_default | std::regex_constants::format_default);
 
 				return result;
 			}

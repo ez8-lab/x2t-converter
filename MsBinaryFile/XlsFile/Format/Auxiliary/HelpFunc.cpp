@@ -36,7 +36,8 @@
 #include "../Logic/Biff_structures/CellRangeRef.h"
 #include "../Logic/GlobalWorkbookInfo.h"
 
-#include <boost/regex.hpp>
+// #include <boost/regex.hpp>
+#include <regex>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 
@@ -285,9 +286,9 @@ const std::string guid2str(_GUID_ & guid)
 
 const std::wstring guidFromStr(const std::wstring & guid_str)
 {
-    boost::wregex match_guid(L"[A-Za-z0-9_]{8}-[A-Za-z0-9_]{4}-[A-Za-z0-9_]{4}-[A-Za-z0-9_]{4}-[A-Za-z0-9_]{12}");
-    boost::wsmatch result;
-    if(boost::regex_search(guid_str, result, match_guid))
+    std::wregex match_guid(L"[A-Za-z0-9_]{8}-[A-Za-z0-9_]{4}-[A-Za-z0-9_]{4}-[A-Za-z0-9_]{4}-[A-Za-z0-9_]{12}");
+    std::wsmatch result;
+    if(std::regex_search(guid_str, result, match_guid))
     {
         return result.str();
     }
@@ -359,7 +360,7 @@ const std::wstring wchar_t2hex_str(const wchar_t val)
 }
 
 
-static boost::wregex match_hex(L"^_x[0-9A-F]{4}_");
+static std::wregex match_hex(L"^_x[0-9A-F]{4}_");
 const std::wstring escape_ST_Xstring(const std::wstring& wstr)
 {
 	std::wstring ret_val = L"";
@@ -372,7 +373,7 @@ const std::wstring escape_ST_Xstring(const std::wstring& wstr)
 		{
 			ret_val += L"_x" + wchar_t2hex_str(in_symb) + L"_";
 		}
-		else if(L'_' == in_symb && boost::regex_search(std::wstring(wstr, i, 7), match_hex))
+		else if(L'_' == in_symb && std::regex_search(wstr.c_str() + i, wstr.c_str() + i + 7, match_hex))
 		{
 			ret_val += L"_x005F_";
 		}
@@ -399,7 +400,7 @@ const std::wstring unescape_ST_Xstring(const std::wstring& wstr)
         x_pos_next = boost::algorithm::find_first(it_range, L"_x").begin();
 
         if ( wstr_end == x_pos_next) break;
-        if(!boost::regex_search(x_pos_next, wstr_end, match_hex))
+        if(!std::regex_search(x_pos_next, wstr_end, match_hex))
 		{
 			x_pos_next += 2;
 			ret_val.append(x_pos_noncopied, x_pos_next);
@@ -625,14 +626,14 @@ const std::wstring tab2sheet_name(const short tabid, std::vector<std::wstring>& 
 }
 const std::wstring name2sheet_name(std::wstring name, const std::wstring prefix)
 {
-	static boost::wregex correct_sheet_name(L"^\\'.+?\\'$");
-    static boost::wregex test_sheet_name(L"[\\s)(\\!\\'&:-]+"); //.??? 6442946.xls
+	static std::wregex correct_sheet_name(L"^\\'.+?\\'$");
+    static std::wregex test_sheet_name(L"[\\s)(\\!\\'&:-]+"); //.??? 6442946.xls
 
 	std::wstring sheet_first = prefix + name;
 
-	if(!boost::regex_search(sheet_first.begin(), sheet_first.end(), correct_sheet_name))
+	if(!std::regex_search(sheet_first.begin(), sheet_first.end(), correct_sheet_name))
 	{
-		if(boost::regex_search(sheet_first.begin(), sheet_first.end(), test_sheet_name))
+		if(std::regex_search(sheet_first.begin(), sheet_first.end(), test_sheet_name))
 		{
 			sheet_first = boost::algorithm::replace_all_copy(sheet_first, L"'", L"''");
 			sheet_first = std::wstring(L"'") + sheet_first + std::wstring(L"'");
@@ -646,15 +647,15 @@ const std::wstring xti_indexes2sheet_name(const short tabFirst, const short tabL
 	{
 		return L"#REF";
 	}
-	static boost::wregex correct_table_name(L"^\\'.+?\\'$");
-    static boost::wregex test_table_name(L"([\\s)(\\!\\'&:-]+)|(^[\\d]+)"); //.??? 6442946.xls 5558608.xls
+	static std::wregex correct_table_name(L"^\\'.+?\\'$");
+    static std::wregex test_table_name(L"([\\s)(\\!\\'&:-]+)|(^[\\d]+)"); //.??? 6442946.xls 5558608.xls
 
 	std::wstring table_name = tab2sheet_name(tabFirst, names);
 	std::wstring sheet_first = prefix + table_name;
 
-	if(!boost::regex_search(table_name.begin(), table_name.end(), correct_table_name))
+	if(!std::regex_search(table_name.begin(), table_name.end(), correct_table_name))
 	{
-		if(boost::regex_search(table_name.begin(), table_name.end(), test_table_name))
+		if(std::regex_search(table_name.begin(), table_name.end(), test_table_name))
 		{
 			sheet_first = boost::algorithm::replace_all_copy(sheet_first, L"'", L"''");
 			sheet_first = std::wstring(L"'") + sheet_first + std::wstring(L"'");
@@ -666,9 +667,9 @@ const std::wstring xti_indexes2sheet_name(const short tabFirst, const short tabL
 		table_name = tab2sheet_name(tabLast, names);
 		sheet_last = std::wstring(L":") + prefix + table_name;
 
-		if(!boost::regex_search(table_name.begin(), table_name.end(), correct_table_name))
+		if(!std::regex_search(table_name.begin(), table_name.end(), correct_table_name))
 		{
-			if(boost::regex_search(table_name.begin(), table_name.end(), test_table_name))
+			if(std::regex_search(table_name.begin(), table_name.end(), test_table_name))
 			{
 				sheet_last = boost::algorithm::replace_all_copy(sheet_last, L"'", L"''");
 				sheet_last = std::wstring(L"'") + sheet_last + std::wstring(L"'");

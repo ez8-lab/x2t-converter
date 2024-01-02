@@ -32,8 +32,8 @@
 
 #include "logging.h"
 
-#include <boost/algorithm/string.hpp>
-#include <boost/date_time.hpp>
+// #include <boost/algorithm/string.hpp>
+// #include <boost/date_time.hpp>
 
 #include "odp_page_state.h"
 #include "odf_text_context.h"

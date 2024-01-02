@@ -49,8 +49,8 @@ libsocketio {
         $$SOCKET_IO_LIB/src_no_tls/sio_client.cpp
 
     DEFINES += \
-        BOOST_DATE_TIME_NO_LIB \
-        BOOST_REGEX_NO_LIB \
+        # BOOST_DATE_TIME_NO_LIB \
+        # BOOST_REGEX_NO_LIB \
         ASIO_STANDALONE \
         \
         _WEBSOCKETPP_CPP11_STL_ \

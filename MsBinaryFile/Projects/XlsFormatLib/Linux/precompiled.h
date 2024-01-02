@@ -15,7 +15,8 @@
 #include <boost/noncopyable.hpp>
 #include <boost/foreach.hpp>
 #include <unordered_map>
-#include <boost/regex.hpp>
+// #include <boost/regex.hpp>
+#include <regex>
 #include <string.h>
 #include <fstream>
 #include <memory>

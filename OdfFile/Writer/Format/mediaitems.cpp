@@ -33,7 +33,7 @@
 #include "mediaitems.h"
 #include "odf_rels.h"
 
-#include <boost/regex.h>
+// #include <boost/regex.h>
 #include <boost/algorithm/string/case_conv.hpp>
 
 #include "../../../OOXML/Base/Unit.h"

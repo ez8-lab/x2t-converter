@@ -33,7 +33,8 @@
 #include "logging.h"
 
 #include <boost/algorithm/string.hpp>
-#include <boost/date_time.hpp>
+// #include <boost/date_time.hpp>
+#include <chrono>
 
 #include "../../Formulas/formulasconvert.h"
 
@@ -69,23 +70,30 @@ namespace utils//////////////////////////////////////////// ОБЩАЯ хрен�
 {
 	std::wstring convert_date(int date)
 	{
-		boost::gregorian::date date_ = boost::gregorian::date(1900, 1, 1) + boost::gregorian::date_duration(date - 2);
+		// 计算从1900年1月1日开始的天数
+		int days_since_1900 = date - 2;
 
-		std::wstring date_str;
+		int years = days_since_1900 / 365;
+		days_since_1900 -= years * 365;
 
-		try
-		{
-			date_str = boost::lexical_cast<std::wstring>(date_.year())
-				+ L"-" +
-				(date_.month() < 10 ? L"0" : L"") + boost::lexical_cast<std::wstring>(date_.month().as_number())
-				+ L"-" +
-				(date_.day() < 10 ? L"0" : L"") + boost::lexical_cast<std::wstring>(date_.day());
+		int leap_years = (years + 2) / 4; // 考虑1900年不是闰年，但2000年是闰年
+		days_since_1900 -= leap_years;
+
+		int months[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+		if ((years % 4 == 0 && years % 100 != 0) || years % 400 == 0) {
+			months[1] = 29;
 		}
-		catch (...)
-		{
-			date_str = std::to_wstring(date);
+
+		int month = 0;
+		while (days_since_1900 >= months[month]) {
+			days_since_1900 -= months[month];
+			month++;
 		}
-		return date_str;
+
+		// 创建日期字符串
+		std::wostringstream date_str;
+		date_str << 1900 + years << L"-" << std::setw(2) << std::setfill(L'0') << month + 1 << L"-" << std::setw(2) << std::setfill(L'0') << days_since_1900 + 1;
+		return date_str.str();
 	}
 	std::wstring convert_date(const std::wstring & oox_date)
 	{
@@ -106,10 +114,8 @@ namespace utils//////////////////////////////////////////// ОБЩАЯ хрен�
 		int hours = 0, minutes = 0;
 		double sec = 0;
 
-		boost::posix_time::time_duration day(24, 0, 0);
-
-		double millisec = day.total_milliseconds() * dTime;
-
+		// Calculate milliseconds and convert to double
+		double millisec = 24 * 3600000ll * dTime;
 
 		sec = millisec / 1000.;
 		hours = (int)(sec / 60. / 60.);
@@ -996,12 +1002,12 @@ void ods_table_state::set_cell_formula(std::wstring & formula)
 	
 	//test external link
 	bool bExternal = !ods_context->externals_.empty();
-	boost::wregex re(L"([\\[]\\d+[\\]])+");
+	std::wregex re(L"([\\[]\\d+[\\]])+");
 
 	while(bExternal)
 	{
-		boost::wsmatch result;
-		bExternal = boost::regex_search(formula, result, re);
+		std::wsmatch result;
+		bExternal = std::regex_search(formula, result, re);
 		if (!bExternal) break;
 
 		
@@ -1064,7 +1070,7 @@ void ods_table_state::set_cell_formula(std::wstring & formula)
 	cells_.back().empty = false;
 }
 
-std::wstring ods_table_state::replace_cell_row(boost::wsmatch const & what)
+std::wstring ods_table_state::replace_cell_row(std::wsmatch const & what)
 {
     if (what[1].matched)
 	{
@@ -1084,7 +1090,7 @@ std::wstring ods_table_state::replace_cell_row(boost::wsmatch const & what)
 	else
 		return L"";
 }
-std::wstring ods_table_state::replace_cell_column(boost::wsmatch const & what)
+std::wstring ods_table_state::replace_cell_column(std::wsmatch const & what)
 {
     if (what[1].matched)
 	{
@@ -1150,11 +1156,11 @@ void ods_table_state::add_or_find_cell_shared_formula(std::wstring & formula, st
 				tmp_column_ = pFind->second.base_column;
 				tmp_row_	= pFind->second.base_row;
 				
-				const std::wstring res = boost::regex_replace(
+				const std::wstring res = regex_replace(
 					odf_formula,
-					boost::wregex(L"([a-zA-Z]{1,3}[0-9]{1,3})|(?='.*?')|(?=\".*?\")"),
+					std::wregex(L"([a-zA-Z]{1,3}[0-9]{1,3})|(?='.*?')|(?=\".*?\")"),
 					&ods_table_state::replace_cell_column,
-					boost::match_default | boost::format_all);
+					std::regex_constants::match_default | std::regex_constants::format_default);
 				odf_formula = res;
 			}
 			else if (pFind->second.moving_type == 2)
@@ -1162,11 +1168,11 @@ void ods_table_state::add_or_find_cell_shared_formula(std::wstring & formula, st
 				tmp_column_ = pFind->second.base_column;
 				tmp_row_	= pFind->second.base_row;
 				
-				const std::wstring res = boost::regex_replace(
+				const std::wstring res = regex_replace(
 					odf_formula,
-					boost::wregex(L"([a-zA-Z]{1,3}[0-9]{1,3})|(?='.*?')|(?=\".*?\")"),
+					std::wregex(L"([a-zA-Z]{1,3}[0-9]{1,3})|(?='.*?')|(?=\".*?\")"),
 					&ods_table_state::replace_cell_row,
-					boost::match_default | boost::format_all);
+					std::regex_constants::match_default | std::regex_constants::format_default);
 				odf_formula = res;
 			}
 			cell->attlist_.table_formula_ = odf_formula;				

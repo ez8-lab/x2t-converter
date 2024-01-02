@@ -33,7 +33,7 @@ LIBS += -L$$CORE_BUILDS_LIBRARIES_PATH -lkernel_network
 # внешнее подключение сторонних библиотек
 
 #BOOST
-CONFIG += core_boost_regex
+# CONFIG += core_boost_regex
 include($$CORE_ROOT_DIR/Common/3dParty/boost/boost.pri)
 
 core_windows {

@@ -37,7 +37,8 @@
 #include "styles_list.h"
 #include "style_text_properties.h"
 
-#include <boost/regex.hpp>
+// #include <boost/regex.hpp>
+#include <regex>
 #include <boost/lexical_cast.hpp>
  
 namespace cpdoccore {
@@ -487,9 +488,9 @@ void odf_lists_styles_context::set_numeric_format(std::wstring val)
 			s = s.substr(0,r1);
 		}
 		
-		boost::wregex r(L"(\\%[0-9]+)(\\S+)");
-		boost::match_results<std::wstring::const_iterator> res;
-		if ( boost::regex_match(s, res, r))
+		std::wregex r(L"(\\%[0-9]+)(\\S+)");
+		std::match_results<std::wstring::const_iterator> res;
+		if ( std::regex_match(s, res, r))
 		{
 			std::wstring suffix = res[2].str();
 			if (!suffix.empty()) 

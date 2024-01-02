@@ -2,15 +2,15 @@
 
 import sys
 import os
-sys.path.append("../../../../build_tools/scripts")
+# sys.path.append("../../../../build_tools/scripts")
 import base
 
 # fetch harfbuzz
-if not base.is_dir("harfbuzz"):
-  base.cmd("git", ["clone", "https://github.com/harfbuzz/harfbuzz.git"])
-  os.chdir("harfbuzz")
-  base.cmd("git", ["checkout", "8d1b000a3edc90c12267b836b4ef3f81c0e53edc"])
-  os.chdir("../")
+if True:#not base.is_dir("harfbuzz"):
+  #base.cmd("git", ["clone", "https://github.com/harfbuzz/harfbuzz.git"])
+  #os.chdir("harfbuzz")
+  #base.cmd("git", ["checkout", "8d1b000a3edc90c12267b836b4ef3f81c0e53edc"])
+  #os.chdir("../")
 
   qmake_content_lines = []
   

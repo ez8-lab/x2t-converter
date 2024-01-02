@@ -226,6 +226,7 @@ core_windows {
 
 core_linux {
 	equals(TEMPLATE, app) {
+		QMAKE_LFLAGS += "-Wl,-rpath,."
 		QMAKE_LFLAGS += "-Wl,-rpath,\'\$$ORIGIN\'"
 		QMAKE_LFLAGS += "-Wl,-rpath,\'\$$ORIGIN/system\'"
 		QMAKE_LFLAGS += -Wl,--disable-new-dtags
@@ -260,7 +261,7 @@ core_mac_64 {
 core_linux_arm {
 	CORE_BUILDS_PLATFORM_PREFIX = arm
 }
-linux_arm64 {
+core_linux_host_arm64 {
 	CORE_BUILDS_PLATFORM_PREFIX = linux_arm64
 	DEFINES += _ARM_ALIGN_
 
@@ -272,10 +273,10 @@ linux_arm64 {
 
 			ARM64_TOOLCHAIN_BIN_FULL = $$ARM64_TOOLCHAIN_BIN/$$ARM64_TOOLCHAIN_BIN_PREFIX
 
-			QMAKE_CC          = $$join(ARM64_TOOLCHAIN_BIN_FULL, , , "gcc")
-			QMAKE_CXX         = $$join(ARM64_TOOLCHAIN_BIN_FULL, , , "g++")
-			QMAKE_LINK        = $$join(ARM64_TOOLCHAIN_BIN_FULL, , , "g++")
-			QMAKE_LINK_SHLIB  = $$join(ARM64_TOOLCHAIN_BIN_FULL, , , "g++")
+			QMAKE_CC          = $$join(ARM64_TOOLCHAIN_BIN_FULL, , , "clang")
+			QMAKE_CXX         = $$join(ARM64_TOOLCHAIN_BIN_FULL, , , "clang++")
+			QMAKE_LINK        = $$join(ARM64_TOOLCHAIN_BIN_FULL, , , "clang++")
+			QMAKE_LINK_SHLIB  = $$join(ARM64_TOOLCHAIN_BIN_FULL, , , "clang++")
 
 			QMAKE_AR          = $$join(ARM64_TOOLCHAIN_BIN_FULL, , , "ar cqs")
 			QMAKE_OBJCOPY     = $$join(ARM64_TOOLCHAIN_BIN_FULL, , , "objcopy")
