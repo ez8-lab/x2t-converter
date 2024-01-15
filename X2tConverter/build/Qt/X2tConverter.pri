@@ -100,15 +100,15 @@ LIBS += -L$$CORE_BUILDS_LIBRARIES_PATH -lCryptoPPLib
 
 #All dynamic libs
 
-ADD_DEPENDENCY(graphics, kernel, UnicodeConverter, kernel_network, Fb2File, PdfFile, HtmlFile2, EpubFile, XpsFile, DjVuFile, HtmlRenderer, doctrenderer, DocxRenderer)
+ADD_DEPENDENCY(graphics, kernel, UnicodeConverter, kernel_network, PdfFile, HtmlFile2, XpsFile, HtmlRenderer, doctrenderer, DocxRenderer)
 
 
 #####################################################
 # внешнее подключение сторонних библиотек
 
 #BOOST
-CONFIG += core_boost_regex
-include($$PWD/../../../Common/3dParty/boost/boost.pri)
+# CONFIG += core_boost_regex
+# include($$PWD/../../../Common/3dParty/boost/boost.pri)
 
 core_windows {
     LIBS += -lAdvapi32

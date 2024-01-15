@@ -54,10 +54,10 @@
 #include "../../DesktopEditor/graphics/MetafileToGraphicsRenderer.h"
 #include "../../DesktopEditor/graphics/pro/Fonts.h"
 
-#include "../../DjVuFile/DjVu.h"
+// #include "../../DjVuFile/DjVu.h"
 #include "../../DocxRenderer/DocxRenderer.h"
-#include "../../EpubFile/CEpubFile.h"
-#include "../../Fb2File/Fb2File.h"
+// #include "../../EpubFile/CEpubFile.h"
+// #include "../../Fb2File/Fb2File.h"
 #include "../../HtmlFile2/htmlfile2.h"
 #include "../../HtmlRenderer/include/HTMLRenderer3.h"
 #include "../../PdfFile/PdfFile.h"
@@ -1881,11 +1881,11 @@ namespace NExtractTools
 		}
 		else
 		{
-			CEpubFile oFile;
+			/*CEpubFile oFile;
 			std::wstring sEpubTemp = sTemp + FILE_SEPARATOR_STR + L"tmp";
 			NSDirectory::CreateDirectory(sEpubTemp);
 			oFile.SetTempDirectory(sEpubTemp);
-			if (S_FALSE == oFile.FromHtml(sHtmlFile, sTo, params.m_sTitle ? *params.m_sTitle : L""))
+			if (S_FALSE == oFile.FromHtml(sHtmlFile, sTo, params.m_sTitle ? *params.m_sTitle : L""))*/
 				nRes = AVS_FILEUTILS_ERROR_CONVERT;
 		}
 		return nRes;
@@ -1913,9 +1913,10 @@ namespace NExtractTools
 		}
 		else
 		{
+			/*
 			CFb2File fb2File;
 			fb2File.SetTmpDirectory(sTemp);
-			if (S_FALSE == fb2File.FromHtml(sHtmlFile, sTo, params.m_sTitle ? *params.m_sTitle : L""))
+			if (S_FALSE == fb2File.FromHtml(sHtmlFile, sTo, params.m_sTitle ? *params.m_sTitle : L""))*/
 				nRes = AVS_FILEUTILS_ERROR_CONVERT;
 		}
 		return nRes;
@@ -3574,15 +3575,17 @@ namespace NExtractTools
 	// epub
 	_UINT32 epub2docx_dir(const std::wstring &sFrom, const std::wstring &sTo, const std::wstring &sTemp, InputParams &params)
 	{
-		CEpubFile oFile;
+		return AVS_FILEUTILS_ERROR_CONVERT;
+		/*CEpubFile oFile;
 		oFile.SetTempDirectory(sTemp);
-		return (S_OK == oFile.Convert(sFrom, sTo, false)) ? 0 : AVS_FILEUTILS_ERROR_CONVERT;
+		return (S_OK == oFile.Convert(sFrom, sTo, false)) ? 0 : AVS_FILEUTILS_ERROR_CONVERT;*/
 	}
 	_UINT32 fb2docx_dir(const std::wstring &sFrom, const std::wstring &sTo, const std::wstring &sTemp, InputParams &params)
 	{
-		CFb2File fb2File;
+		return AVS_FILEUTILS_ERROR_CONVERT;
+		/*CFb2File fb2File;
 		fb2File.SetTmpDirectory(sTemp);
-		return S_OK == fb2File.Open(sFrom, sTo) ? S_OK : AVS_FILEUTILS_ERROR_CONVERT;
+		return S_OK == fb2File.Open(sFrom, sTo) ? S_OK : AVS_FILEUTILS_ERROR_CONVERT;*/
 	}
 	_UINT32 fb2docx(const std::wstring &sFrom, const std::wstring &sTo, const std::wstring &sTemp, InputParams &params)
 	{
@@ -3855,7 +3858,7 @@ namespace NExtractTools
 		}
 		else if (AVS_OFFICESTUDIO_FILE_CROSSPLATFORM_DJVU == nFormatFrom)
 		{
-			pReader = new CDjVuFile(pApplicationFonts);
+			// pReader = new CDjVuFile(pApplicationFonts);
 		}
 		else if (AVS_OFFICESTUDIO_FILE_CROSSPLATFORM_XPS == nFormatFrom)
 		{
@@ -3942,7 +3945,7 @@ namespace NExtractTools
 		}
 		else if (AVS_OFFICESTUDIO_FILE_CROSSPLATFORM_DJVU == nFormatFrom)
 		{
-			pReader = new CDjVuFile(pApplicationFonts);
+			// pReader = new CDjVuFile(pApplicationFonts);
 		}
 		else if (AVS_OFFICESTUDIO_FILE_CROSSPLATFORM_XPS == nFormatFrom)
 		{
@@ -5236,7 +5239,7 @@ namespace NExtractTools
 				pReader = new CXpsFile(pApplicationFonts);
 				break;
 			case AVS_OFFICESTUDIO_FILE_CROSSPLATFORM_DJVU:
-				pReader = new CDjVuFile(pApplicationFonts);
+				// pReader = new CDjVuFile(pApplicationFonts);
 				break;
 			default:
 				break;

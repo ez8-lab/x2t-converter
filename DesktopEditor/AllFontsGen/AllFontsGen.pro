@@ -15,7 +15,7 @@ TARGET = allfontsgen
 
 DEFINES += KERNEL_USE_DYNAMIC_LIBRARY
 DEFINES += GRAPHICS_USE_DYNAMIC_LIBRARY
-ADD_DEPENDENCY(graphics, kernel)
+ADD_DEPENDENCY(graphics kernel UnicodeConverter)
 
 core_windows {
     DEFINES -= UNICODE
