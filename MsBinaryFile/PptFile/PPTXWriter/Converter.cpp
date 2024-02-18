@@ -1906,10 +1906,11 @@ namespace PPT
 
     std::vector<std::wstring> CPPTXWriter::GrepPaths(const std::vector<std::wstring>& paths, const std::wstring& strRegEx)
     {
-        std::wregex regEx(strRegEx);
-        std::wsmatch wSmath;
+        std::vector<std::wstring> filtredPaths;
         try
         {
+            std::wregex regEx(strRegEx);
+            std::wsmatch wSmath;
             for (const auto& path : paths)
             {
                 if (std::regex_match(path, wSmath, regEx))
