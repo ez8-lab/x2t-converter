@@ -47,6 +47,7 @@ std::wostream & operator << (std::wostream & _Wostream, const clockvalue & _Val)
 		_Wostream << L"indefinite";
 	else
 	{
+#if 0
 		int ms	= _Val.get_value();
 		int sec = 0;
 		int min = 0;
@@ -81,6 +82,13 @@ std::wostream & operator << (std::wostream & _Wostream, const clockvalue & _Val)
 
 		if (h == 0 && min == 0 && ms == 0 && sec == 0)
 			_Wostream << "0s"; 
+#else 
+		int ms = _Val.get_value();
+		float sec = ms / 1000.0f;
+
+		_Wostream << sec << L"s";
+
+#endif
 	}
     return _Wostream;    
 }
@@ -147,7 +155,7 @@ bool parseTime(std::wstring Time, double & Hours, double & Minutes, double & Sec
 		std::wregex r3 (L"([\\d+(\\.\\d{0,})?]+)([A-Za-z]+)");
         if (regex_split(values, Time, r3))
         {	
-			int val = -1;
+			double val = -1;
 			for (size_t i = 0; i < values.size() ; i++ )
 			{
 				if (values[i].empty()) continue;
